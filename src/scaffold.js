@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 import {
   access,
   cp,
@@ -11,9 +11,7 @@ import {
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
 
-const execFileAsync = promisify(execFile);
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
 const templateDirectory = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -71,8 +69,19 @@ async function execute(options, command, argumentsList, cwd) {
     await options.runCommand(command, argumentsList, cwd);
     return;
   }
-  await execFileAsync(command, argumentsList, {
-    cwd,
-    maxBuffer: 10 * 1024 * 1024,
+  await new Promise((resolvePromise, rejectPromise) => {
+    const child = spawn(command, argumentsList, {
+      cwd,
+      shell: false,
+      stdio: "inherit",
+    });
+    child.once("error", rejectPromise);
+    child.once("exit", (code) => {
+      if (code === 0) {
+        resolvePromise();
+        return;
+      }
+      rejectPromise(new Error(`${command} exited with code ${code ?? "unknown"}.`));
+    });
   });
 }

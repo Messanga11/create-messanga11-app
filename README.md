@@ -4,7 +4,7 @@ Scaffold a complete Next.js and Expo monorepo powered by the public
 `@messanga11/core` GitHub release.
 
 ```sh
-npx --yes github:Messanga11/create-messanga11-app#v0.1.0 my-app
+npx --yes github:Messanga11/create-messanga11-app#v0.1.1 my-app
 ```
 
 No GitHub or npm token is required. The generated project contains:
@@ -21,7 +21,7 @@ The generated dependency on `@messanga11/core` is pinned to the immutable
 ## Options
 
 ```sh
-npx --yes github:Messanga11/create-messanga11-app#v0.1.0 my-app --no-install
+npx --yes github:Messanga11/create-messanga11-app#v0.1.1 my-app --no-install
 ```
 
 Project names accept lowercase letters, numbers and hyphens. Existing non-empty

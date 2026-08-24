@@ -1,6 +1,6 @@
 {
   "name": "create-messanga11-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scaffold a Next.js and Expo monorepo powered by @messanga11/core.",
   "license": "MIT",
   "type": "module",
