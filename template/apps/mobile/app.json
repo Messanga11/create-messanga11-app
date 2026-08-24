@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "__PROJECT_NAME__",
+    "slug": "__PROJECT_NAME__",
+    "scheme": "__PROJECT_NAME__",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "ios": {
+      "bundleIdentifier": "com.messanga11.__PROJECT_IDENTIFIER__",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.messanga11.__PROJECT_IDENTIFIER__"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @starter/domain && npm run build -w @starter/web && npm run build -w @starter/mobile",
+    "build:mobile": "npm run build -w @starter/mobile",
+    "build:web": "npm run build -w @starter/web",
+    "dev:mobile": "npm run dev -w @starter/mobile",
+    "dev:web": "npm run dev -w @starter/web",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
