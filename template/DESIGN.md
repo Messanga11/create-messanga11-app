@@ -115,13 +115,19 @@ the two renderers.
 2. Add its identifier to `FEATURE_IDS` and map it in `FeatureRoot`.
 3. Add exactly the corresponding Web and Mobile paths to
    `packages/features/routes.config.json`, including truthful Web metadata.
-4. Run `npm run routes:generate` or keep either development server running.
+4. Save the registry while either development server is running: the route is
+   generated and hot-reloaded immediately. Use `npm run routes:generate` only for
+   an explicit one-shot generation.
 
 The generator creates physical App Router and Expo Router files, plus the Web
 canonical metadata, robots directives and sitemap entries. Do not add SEO claims,
 locales, Open Graph images, JSON-LD entities or routes that are not present in the
 product brief. Configure the public origin with `NEXT_PUBLIC_SITE_URL`; production
 must not use the localhost fallback.
+
+The watcher supports editors that save by replacing the file atomically. Rapid
+saves are debounced, a change received during generation is queued, and invalid
+intermediate JSON keeps the last valid pages active until the next valid save.
 
 ## 5. Typography
 
