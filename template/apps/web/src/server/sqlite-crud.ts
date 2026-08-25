@@ -29,6 +29,15 @@ database.exec(`
     tenantId TEXT,
     createdAt TEXT NOT NULL
   )
+  ;
+  CREATE TABLE IF NOT EXISTS invoices (
+    id TEXT PRIMARY KEY,
+    idempotencyKey TEXT NOT NULL UNIQUE,
+    invoiceNumber TEXT NOT NULL UNIQUE,
+    payload TEXT NOT NULL,
+    total REAL NOT NULL,
+    createdAt TEXT NOT NULL
+  )
 `);
 
 const insertAudit = database.prepare(`
@@ -63,6 +72,18 @@ export const sqliteCrud = createSqliteCrudAdapter({
       columns: ["id", "idempotencyKey", "formId", "payload", "status", "createdAt"],
       jsonColumns: ["payload"],
       table: "form_submissions",
+    },
+    invoices: {
+      columns: [
+        "id",
+        "idempotencyKey",
+        "invoiceNumber",
+        "payload",
+        "total",
+        "createdAt",
+      ],
+      jsonColumns: ["payload"],
+      table: "invoices",
     },
   },
 });

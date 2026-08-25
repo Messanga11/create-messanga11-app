@@ -10,6 +10,11 @@ test("generates pages, SEO and the backend route from the feature catalog", asyn
     /FormBuilder complexe/,
   );
   assert.ok(files.has("apps/mobile/app/formulaire.tsx"));
+  assert.match(
+    files.get("apps/web/src/app/factures/page.tsx"),
+    /Mini générateur de facture/,
+  );
+  assert.ok(files.has("apps/mobile/app/factures.tsx"));
   assert.ok(
     files.has("apps/web/src/app/api/features/[featureId]/[operationId]/route.ts"),
   );

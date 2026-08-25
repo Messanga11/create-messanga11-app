@@ -34,12 +34,22 @@ export interface NavigationPrimitiveProps extends PrimitiveProps {
 
 export interface TextFieldPrimitiveProps {
   readonly disabled: boolean;
-  readonly inputMode: "email" | "text";
+  readonly inputMode: "decimal" | "email" | "text";
   readonly label: string;
   readonly onChange: (value: string) => void;
   readonly secure: boolean;
   readonly value: string;
 }
+
+export interface FeatureMutationRequest {
+  readonly featureId: string;
+  readonly input: JsonValue;
+  readonly operationId: string;
+}
+
+export type FeatureMutationExecutor = (
+  request: FeatureMutationRequest,
+) => Promise<JsonValue>;
 
 export interface FormBuilderPrimitiveProps {
   readonly defaultValues: FormValues;
@@ -70,6 +80,7 @@ export interface UiEngine {
   readonly SectionHeading: ComponentType<IdentifiedPrimitiveProps>;
   readonly StatusText: ComponentType<PrimitiveProps>;
   readonly TextField: ComponentType<TextFieldPrimitiveProps>;
+  readonly executeMutation: FeatureMutationExecutor;
 }
 
 interface UiEngineProviderProps extends PrimitiveProps {
@@ -144,6 +155,19 @@ export function FormBuilder(props: FormBuilderPrimitiveProps) {
 
 export function FeatureLayout(props: FeatureLayoutPrimitiveProps) {
   return createElement(useUiEngine().FeatureLayout, props);
+}
+
+export function useFeatureMutation(): FeatureMutationExecutor {
+  return useUiEngine().executeMutation;
+}
+
+export function isJsonValue(value: unknown): value is JsonValue {
+  if (value === null || typeof value === "boolean" || typeof value === "string")
+    return true;
+  if (typeof value === "number") return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every(isJsonValue);
+  if (typeof value !== "object") return false;
+  return Object.values(value).every(isJsonValue);
 }
 
 function useUiEngine(): UiEngine {

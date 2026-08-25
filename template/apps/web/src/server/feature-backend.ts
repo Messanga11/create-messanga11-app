@@ -5,6 +5,7 @@ import {
   type FeatureOperationInvocation,
 } from "@messanga11/core/feature-server";
 import { compileFeatureCatalog } from "@messanga11/core/features";
+import { calculateInvoiceAmounts } from "@starter/domain";
 import { APP_FEATURE_CATALOG } from "@starter/features/catalog";
 import { sqliteCrud, writeFeatureAudit } from "./sqlite-crud";
 
@@ -19,7 +20,10 @@ const PORTS: FeatureBackendPorts = {
     operation.access.permissions.every((permission) =>
       context.permissions.has(permission),
     ),
-  handlers: { "form-builder.submit": submitForm },
+  handlers: {
+    "form-builder.submit": submitForm,
+    "invoice.create": createInvoice,
+  },
   rateLimit: async ({ context, operation, policy }) =>
     consumeRateLimit(`${context.rateLimitKey ?? "anonymous"}:${operation}`, policy),
 };
@@ -58,7 +62,11 @@ export async function handleFeatureRequest(
     { code: result.code, requestId: result.requestId },
     {
       ...(result.retryAfterMs
-        ? { headers: { "retry-after": String(Math.ceil(result.retryAfterMs / 1_000)) } }
+        ? {
+            headers: {
+              "retry-after": String(Math.ceil(result.retryAfterMs / 1_000)),
+            },
+          }
         : {}),
       status: statusFor(result.code),
     },
@@ -91,12 +99,46 @@ async function submitForm(invocation: FeatureOperationInvocation) {
   }
 }
 
+async function createInvoice(invocation: FeatureOperationInvocation) {
+  const idempotencyKey = invocation.idempotencyKey;
+  if (!idempotencyKey) throw new Error("Missing idempotency key.");
+  const existing = await findByIdempotencyKey("invoices", idempotencyKey);
+  if (existing) return pickInvoiceResult(existing);
+  const input = readInvoiceInput(invocation.input);
+  const amounts = calculateInvoiceAmounts(input);
+  if (!amounts) throw new Error("Invalid invoice amounts.");
+  const createdAt = new Date().toISOString();
+  const invoiceNumber = `FAC-${createdAt.slice(0, 10).replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  try {
+    const record = await sqliteCrud.create({
+      idempotencyKey,
+      resource: "invoices",
+      values: {
+        createdAt,
+        idempotencyKey,
+        invoiceNumber,
+        payload: invocation.input,
+        total: amounts.total,
+      },
+    });
+    return pickInvoiceResult(record);
+  } catch (caught) {
+    const raced = await findByIdempotencyKey("invoices", idempotencyKey);
+    if (raced) return pickInvoiceResult(raced);
+    throw caught;
+  }
+}
+
 async function findSubmission(idempotencyKey: string) {
+  return findByIdempotencyKey("form_submissions", idempotencyKey);
+}
+
+async function findByIdempotencyKey(resource: string, idempotencyKey: string) {
   const result = await sqliteCrud.list({
     filters: [{ field: "idempotencyKey", operator: "eq", value: idempotencyKey }],
     limit: 1,
     offset: 0,
-    resource: "form_submissions",
+    resource,
   });
   return result.records[0];
 }
@@ -105,9 +147,40 @@ function pickSubmissionResult(record: Readonly<Record<string, JsonValue>>): Json
   return { createdAt: record.createdAt ?? "", id: record.id ?? "" };
 }
 
+function pickInvoiceResult(record: Readonly<Record<string, JsonValue>>): JsonValue {
+  return {
+    createdAt: record.createdAt ?? "",
+    id: record.id ?? "",
+    invoiceNumber: record.invoiceNumber ?? "",
+    total: record.total ?? 0,
+  };
+}
+
+function readInvoiceInput(input: JsonValue) {
+  if (!isJsonObject(input)) throw new Error("Invalid invoice input.");
+  return {
+    quantity: readNumber(input.quantity),
+    taxRate: readNumber(input.taxRate),
+    unitPrice: readNumber(input.unitPrice),
+  };
+}
+
+function isJsonObject(value: JsonValue): value is Readonly<Record<string, JsonValue>> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function readNumber(value: JsonValue | undefined): number {
+  if (typeof value !== "number") throw new Error("Invalid invoice number.");
+  return value;
+}
+
 function consumeRateLimit(
   key: string,
-  policy: { readonly cost: number; readonly limit: number; readonly windowMs: number },
+  policy: {
+    readonly cost: number;
+    readonly limit: number;
+    readonly windowMs: number;
+  },
 ) {
   const now = Date.now();
   const current = RATE_LIMITS.get(key);
