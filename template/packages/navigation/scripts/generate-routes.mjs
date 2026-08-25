@@ -1,4 +1,5 @@
-import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { access, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -64,7 +65,7 @@ export async function generateRoutes(options = {}) {
   for (const [relativePath, contents] of expected) {
     await writeGeneratedFile(relativePath, contents);
   }
-  await writeFile(manifestPath, serializeManifest(expected), "utf8");
+  await writeAtomic(manifestPath, serializeManifest(expected));
   return expected;
 }
 
@@ -183,7 +184,13 @@ async function writeGeneratedFile(relativePath, contents) {
     throw new Error(`Refusing to overwrite non-generated file: ${relativePath}`);
   }
   await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, contents, "utf8");
+  await writeAtomic(target, contents);
+}
+
+async function writeAtomic(target, contents) {
+  const temporaryPath = `${target}.${process.pid}.${randomUUID()}.tmp`;
+  await writeFile(temporaryPath, contents, "utf8");
+  await rename(temporaryPath, target);
 }
 
 async function removeGeneratedFile(relativePath) {
