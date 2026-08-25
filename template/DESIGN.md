@@ -58,6 +58,21 @@ Web components consume CSS variables after the root layout imports
 }
 ```
 
+Application screens import semantic primitives from
+`@starter/ui-web`. Do not write intrinsic JSX tags directly:
+
+```tsx
+import { ActionButton, Card, SectionHeading } from "@starter/ui-web";
+
+<Card labelledBy="account-title">
+  <SectionHeading id="account-title">Compte</SectionHeading>
+  <ActionButton onPress={save}>Enregistrer</ActionButton>
+</Card>;
+```
+
+If a semantic primitive is missing, add it once to the Web adapter with a narrow,
+platform-neutral API. Do not expose generic DOM attributes to feature code.
+
 Native components import the same JSON-backed values:
 
 ```ts

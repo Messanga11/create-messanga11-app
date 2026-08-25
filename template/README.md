@@ -24,6 +24,7 @@ apps/web       Next.js App Router and trusted server composition
 apps/mobile    Expo Router and native rendering
 packages/domain  Shared schemas, policies and semantic view-models
 packages/design-system  Shared semantic tokens for Web and Native
+packages/ui-web  Controlled semantic Web primitives
 ```
 
 Design rules and configuration live in `DESIGN.md`. Core provides the defaults;

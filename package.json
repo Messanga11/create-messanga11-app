@@ -1,6 +1,6 @@
 {
   "name": "create-messanga11-app",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Scaffold a Next.js and Expo monorepo powered by @messanga11/core.",
   "license": "MIT",
   "type": "module",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "check": "biome check . && node --check bin/create-messanga11-app.js && node --check src/cli.js && node --check src/scaffold.js",
-    "test": "node --test test/cli.test.js",
+    "test": "node --test test/*.test.js",
     "test:smoke": "node test/smoke.mjs"
   },
   "engines": {
