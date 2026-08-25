@@ -4,7 +4,7 @@ import { DisplayHeading, Eyebrow, IntroText, Page } from "@starter/ui-engine";
 import type { FeatureId } from "../feature-root";
 
 interface SystemFeatureProps {
-  readonly featureId: Exclude<FeatureId, "profile">;
+  readonly featureId: Extract<FeatureId, `system-${string}`>;
 }
 
 const SYSTEM_COPY = {

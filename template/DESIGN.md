@@ -98,6 +98,11 @@ Native props. Platform semantics and styles remain isolated in `ui-web` and
 - `packages/ui-engine` owns stable primitive contracts and the injected provider.
 - `packages/ui-web` maps those contracts to accessible browser semantics.
 - `packages/ui-native` maps the same contracts to accessible Native primitives.
+- `@messanga11/core/forms` owns JSON-safe field, step and validation contracts.
+- `@messanga11/formbuilder` owns TanStack Form orchestration but renders no
+  platform primitive. `ui-web` and `ui-native` inject the renderers.
+- Refine.dev is confined to `ui-web` through `@messanga11/adapter-refine`; it is
+  never imported by shared features or the Native engine.
 - `packages/features/routes.config.json` declares which shared feature each physical
   Web and Mobile route renders. It also owns the exact Web title, description,
   canonical path and indexing decision; the generator never infers product pages.
@@ -107,6 +112,12 @@ Native props. Platform semantics and styles remain isolated in `ui-web` and
 Never branch on platform inside a feature. When a capability differs, express a
 semantic primitive or optional engine capability and implement the difference in
 the two renderers.
+
+Complex forms follow the same rule. The feature declares `FormDefinition` and
+default JSON values. The engines own OTP cells, country lookup, document picking,
+focus restoration, date-range projection and accessible control semantics. File
+definitions contain only metadata constraints; browser `File` and Expo document
+picker results remain inside their respective engines.
 
 ### Adding an actual page
 

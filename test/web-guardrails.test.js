@@ -39,8 +39,8 @@ test("Generated applications only select their renderer engine", async () => {
     "utf8",
   );
 
-  assert.match(webEntry, /WebFeatureRenderer featureId="profile"/);
-  assert.match(nativeEntry, /NativeFeatureRenderer featureId="profile"/);
+  assert.match(webEntry, /WebFeatureRenderer featureId="dashboard"/);
+  assert.match(nativeEntry, /NativeFeatureRenderer featureId="dashboard"/);
   assert.match(webEntry, /export const metadata: Metadata/);
   assert.doesNotMatch(`${webEntry}\n${nativeEntry}`, /useState|UiMeta|ProfileFeature/);
 });

@@ -10,8 +10,14 @@ const config: NextConfig = {
   async headers() {
     return [{ headers: SECURITY_HEADERS, source: "/(.*)" }];
   },
-  serverExternalPackages: ["@messanga11/core"],
+  serverExternalPackages: [
+    "@messanga11/core",
+    "@messanga11/adapter-sqlite",
+    "better-sqlite3",
+  ],
   transpilePackages: [
+    "@messanga11/adapter-refine",
+    "@messanga11/formbuilder",
     "@starter/design-system",
     "@starter/domain",
     "@starter/features",

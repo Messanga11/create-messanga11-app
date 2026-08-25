@@ -9,12 +9,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@messanga11/adapter-sqlite": "https://github.com/Messanga11/core/releases/download/core-v0.3.1/messanga11-adapter-sqlite-0.1.1.tgz",
+    "better-sqlite3": "^13.0.3",
     "@starter/ui-web": "0.1.0",
     "next": "^16.3.2",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3"
   }

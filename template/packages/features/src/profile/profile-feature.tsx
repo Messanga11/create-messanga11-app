@@ -7,44 +7,56 @@ import {
   Badge,
   Card,
   CardCopy,
-  DisplayHeading,
-  Eyebrow,
-  IntroText,
   MetadataText,
-  Page,
   SectionHeading,
   StatusText,
+  TextField,
 } from "@starter/ui-engine";
 import { useState } from "react";
+import { FeatureShell } from "../shared/feature-shell";
+import { getDisplayNameError } from "../shared/validation";
 
 const UI_META = buildProfileUiMeta(["profile:read", "profile:update"]);
 
 export function ProfileFeature() {
-  const [message, setMessage] = useState("Prêt à construire.");
+  const [displayName, setDisplayName] = useState("");
+  const [status, setStatus] = useState("Aucune modification locale.");
   const canEdit = canPerform(UI_META, "edit");
 
+  function saveProfile() {
+    const validationError = getDisplayNameError(displayName);
+    if (validationError) {
+      setStatus(validationError);
+      return;
+    }
+    setStatus("Profil enregistré localement pour la démonstration.");
+  }
+
   return (
-    <Page>
-      <Eyebrow>MESSANGA11 STARTER</Eyebrow>
-      <DisplayHeading>Une logique UI, deux moteurs de rendu.</DisplayHeading>
-      <IntroText>
-        Cette composition, son état et ses actions vivent uniquement dans le package
-        features.
-      </IntroText>
+    <FeatureShell
+      active="profile"
+      description="La policy Core et le formulaire partagé gouvernent la même action sur les deux plateformes."
+      title="Profil"
+    >
       <Card labelledBy="profile-title">
         <CardCopy>
           <Badge>Core connecté</Badge>
-          <SectionHeading id="profile-title">Profil de démonstration</SectionHeading>
+          <SectionHeading id="profile-title">Informations publiques</SectionHeading>
           <MetadataText>Policy revision : {UI_META.revision}</MetadataText>
+          <TextField
+            disabled={!canEdit}
+            inputMode="text"
+            label="Nom affiché"
+            onChange={setDisplayName}
+            secure={false}
+            value={displayName}
+          />
         </CardCopy>
-        <ActionButton
-          disabled={!canEdit}
-          onPress={() => setMessage("Action reçue. Branche maintenant ton API.")}
-        >
-          Modifier le profil
+        <ActionButton disabled={!canEdit} onPress={saveProfile}>
+          Enregistrer le profil
         </ActionButton>
-        <StatusText>{message}</StatusText>
+        <StatusText>{status}</StatusText>
       </Card>
-    </Page>
+    </FeatureShell>
   );
 }

@@ -4,23 +4,29 @@ import {
   type ActionPrimitiveProps,
   type IdentifiedPrimitiveProps,
   type LabelledPrimitiveProps,
+  type NavigationPrimitiveProps,
   type PrimitiveProps,
+  type TextFieldPrimitiveProps,
   type UiEngine,
   UiEngineProvider,
 } from "@starter/ui-engine";
+import { type Href, Link } from "expo-router";
 import {
   Pressable,
   type PressableStateCallbackType,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NativeFormBuilder } from "./form-builder";
 
 function Page({ children }: PrimitiveProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.shell}>{children}</View>
+      <ScrollView contentContainerStyle={styles.shell}>{children}</ScrollView>
     </SafeAreaView>
   );
 }
@@ -90,6 +96,55 @@ function ActionButton({ children, disabled, onPress }: ActionPrimitiveProps) {
   );
 }
 
+const CURRENT_ACCESSIBILITY_STATE = { selected: true } as const;
+const DEFAULT_ACCESSIBILITY_STATE = { selected: false } as const;
+
+function NavigationGroup({ children }: PrimitiveProps) {
+  return <View style={styles.navigation}>{children}</View>;
+}
+
+function NavigationAction({ children, current, path }: NavigationPrimitiveProps) {
+  return (
+    <Link asChild href={path as Href}>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityState={
+          current ? CURRENT_ACCESSIBILITY_STATE : DEFAULT_ACCESSIBILITY_STATE
+        }
+        style={current ? styles.currentNavigationLink : styles.navigationLink}
+      >
+        <Text style={current ? styles.currentNavigationText : styles.navigationText}>
+          {children}
+        </Text>
+      </Pressable>
+    </Link>
+  );
+}
+
+function TextField({
+  disabled,
+  inputMode,
+  label,
+  onChange,
+  secure,
+  value,
+}: TextFieldPrimitiveProps) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <TextInput
+        autoCapitalize={inputMode === "email" ? "none" : "sentences"}
+        editable={!disabled}
+        inputMode={inputMode}
+        onChangeText={onChange}
+        secureTextEntry={secure}
+        style={styles.fieldInput}
+        value={value}
+      />
+    </View>
+  );
+}
+
 function resolveButtonStyle(state: PressableStateCallbackType) {
   return state.pressed ? styles.pressedButton : styles.button;
 }
@@ -101,11 +156,15 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   CardCopy,
   DisplayHeading,
   Eyebrow,
+  FormBuilder: NativeFormBuilder,
   IntroText,
   MetadataText,
+  NavigationAction,
+  NavigationGroup,
   Page,
   SectionHeading,
   StatusText,
+  TextField,
 });
 
 interface NativeFeatureRendererProps {
@@ -172,6 +231,31 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 1.6,
   },
+  currentNavigationLink: {
+    backgroundColor: designTokens.color.ink,
+    borderColor: designTokens.color.ink,
+    borderRadius: designTokens.radius.pill,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: designTokens.spacing.sm,
+  },
+  currentNavigationText: {
+    color: designTokens.color.accentContrast,
+    fontWeight: "700",
+  },
+  field: { gap: designTokens.spacing.xs, marginTop: designTokens.spacing.sm },
+  fieldInput: {
+    backgroundColor: designTokens.color.surface,
+    borderColor: designTokens.color.border,
+    borderRadius: designTokens.radius.control,
+    borderWidth: 1,
+    color: designTokens.color.ink,
+    fontSize: 16,
+    minHeight: 50,
+    paddingHorizontal: designTokens.spacing.sm,
+  },
+  fieldLabel: { color: designTokens.color.ink, fontWeight: "700" },
   lede: {
     color: designTokens.color.body,
     fontSize: 17,
@@ -179,6 +263,21 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   meta: { color: designTokens.color.muted, marginTop: designTokens.spacing.xs },
+  navigation: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: designTokens.spacing.xs,
+    marginBottom: designTokens.spacing.lg,
+  },
+  navigationLink: {
+    borderColor: designTokens.color.border,
+    borderRadius: designTokens.radius.pill,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: designTokens.spacing.sm,
+  },
+  navigationText: { color: designTokens.color.body, fontWeight: "700" },
   pressedButton: {
     alignItems: "center",
     backgroundColor: designTokens.color.ink,
@@ -191,7 +290,7 @@ const styles = StyleSheet.create({
   },
   safeArea: { backgroundColor: designTokens.color.canvas, flex: 1 },
   shell: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: designTokens.spacing.md,
     paddingTop: 36,
   },

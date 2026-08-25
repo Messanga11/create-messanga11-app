@@ -2,22 +2,86 @@
   "app": {
     "name": "__PROJECT_NAME__",
     "shortName": "__PROJECT_NAME__",
-    "description": "Une logique UI partagée entre le Web et le Mobile.",
+    "description": "Démonstration des fonctionnalités partagées Messanga11.",
     "language": "fr"
   },
   "routes": [
     {
+      "id": "dashboard",
+      "featureId": "dashboard",
+      "web": {
+        "path": "/",
+        "title": "Tableau de bord",
+        "description": "Tableau de bord de démonstration Messanga11.",
+        "index": false
+      },
+      "mobile": { "path": "/" }
+    },
+    {
+      "id": "form-builder",
+      "featureId": "form-builder",
+      "web": {
+        "path": "/formulaire",
+        "title": "FormBuilder complexe",
+        "description": "Démonstration du FormBuilder partagé Web et Native.",
+        "index": false
+      },
+      "mobile": { "path": "/formulaire" }
+    },
+    {
+      "id": "authentication",
+      "featureId": "authentication",
+      "web": {
+        "path": "/authentification",
+        "title": "Authentification",
+        "description": "Écran local de démonstration de l’authentification.",
+        "index": false
+      },
+      "mobile": { "path": "/authentification" }
+    },
+    {
       "id": "profile",
       "featureId": "profile",
       "web": {
-        "path": "/",
-        "title": "__PROJECT_NAME__",
-        "description": "Une logique UI partagée entre le Web et le Mobile.",
-        "index": true
+        "path": "/profil",
+        "title": "Profil",
+        "description": "Gestion locale du profil de démonstration.",
+        "index": false
       },
-      "mobile": {
-        "path": "/"
-      }
+      "mobile": { "path": "/profil" }
+    },
+    {
+      "id": "notifications",
+      "featureId": "notifications",
+      "web": {
+        "path": "/notifications",
+        "title": "Notifications",
+        "description": "Centre local de notifications de démonstration.",
+        "index": false
+      },
+      "mobile": { "path": "/notifications" }
+    },
+    {
+      "id": "team",
+      "featureId": "team",
+      "web": {
+        "path": "/equipe",
+        "title": "Gestion d’équipe",
+        "description": "Gestion locale d’une équipe de démonstration.",
+        "index": false
+      },
+      "mobile": { "path": "/equipe" }
+    },
+    {
+      "id": "settings",
+      "featureId": "settings",
+      "web": {
+        "path": "/parametres",
+        "title": "Paramètres",
+        "description": "Préférences locales de démonstration.",
+        "index": false
+      },
+      "mobile": { "path": "/parametres" }
     }
   ]
 }

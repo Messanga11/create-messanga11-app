@@ -4,7 +4,7 @@ Scaffold a complete Next.js and Expo monorepo powered by the public
 `@messanga11/core` GitHub release.
 
 ```sh
-npx --yes github:Messanga11/create-messanga11-app#v0.4.2 my-app
+npx --yes github:Messanga11/create-messanga11-app#v0.5.0 my-app
 ```
 
 No GitHub or npm token is required. The generated project contains:
@@ -30,14 +30,16 @@ generated. The Web and Mobile development servers hot-reload that registry and
 create the physical Next.js/Expo Router page files without restarting, including
 truthful per-page SEO.
 
-The generated dependency on `@messanga11/core` is pinned to the immutable
-`core-v0.2.1` release tarball. Core provides the validated design defaults and
-each project keeps only its configurable overrides.
+The generated dependencies are pinned to the immutable public `core-v0.3.1`
+release assets. The scaffold includes the shared complex FormBuilder, the
+Refine.dev Web adapter and the SQLite development adapter. Core provides the
+validated contracts and design defaults; each project keeps its renderers and
+configurable design overrides.
 
 ## Options
 
 ```sh
-npx --yes github:Messanga11/create-messanga11-app#v0.4.2 my-app --no-install
+npx --yes github:Messanga11/create-messanga11-app#v0.5.0 my-app --no-install
 ```
 
 Project names accept lowercase letters, numbers and hyphens. Existing non-empty
