@@ -7,9 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @starter/domain && npm run build -w @starter/web && npm run build -w @starter/mobile",
+    "build": "npm run build -w @starter/design-system && npm run build -w @starter/domain && npm run build -w @starter/web && npm run build -w @starter/mobile",
     "build:mobile": "npm run build -w @starter/mobile",
     "build:web": "npm run build -w @starter/web",
+    "design:sync": "npm run sync -w @starter/design-system",
     "dev:mobile": "npm run dev -w @starter/mobile",
     "dev:web": "npm run dev -w @starter/web",
     "test": "npm run test --workspaces --if-present",

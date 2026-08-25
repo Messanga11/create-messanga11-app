@@ -33,10 +33,19 @@ test("scaffolds both applications and pins core", async () => {
     await readFile(join(target, "packages/domain/package.json"), "utf8"),
   );
   const mobileConfig = await readFile(join(target, "apps/mobile/app.json"), "utf8");
+  const agents = await readFile(join(target, "AGENTS.md"), "utf8");
+  const design = await readFile(join(target, "DESIGN.md"), "utf8");
+  const designManifest = JSON.parse(
+    await readFile(join(target, "packages/design-system/package.json"), "utf8"),
+  );
 
   assert.equal(rootManifest.name, "sample-app");
-  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.2\.0/);
+  assert.equal(designManifest.name, "@starter/design-system");
+  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.2\.1/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
+  assert.match(agents, /Read `DESIGN\.md`/);
+  assert.match(design, /npm run design:sync/);
+  assert.match(design, /@messanga11\/core\/design/);
   await readFile(join(target, "apps/web/src/app/page.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/index.tsx"), "utf8");
 });
