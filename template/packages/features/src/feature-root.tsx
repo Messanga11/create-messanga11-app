@@ -8,6 +8,7 @@ import { APP_FEATURE_CATALOG, type AppFeatureId } from "./app.feature";
 import { AuthenticationFeature } from "./authentication/authentication-feature";
 import { DashboardFeature } from "./dashboard/dashboard-feature";
 import { FormBuilderFeature } from "./form-builder/form-builder-feature";
+import { InvoiceFeature } from "./invoice/invoice-feature";
 import { NotificationsFeature } from "./notifications/notifications-feature";
 import { ProfileFeature } from "./profile/profile-feature";
 import { SettingsFeature } from "./settings/settings-feature";
@@ -22,6 +23,9 @@ const BLOCKS: Readonly<
   "dashboard.screen": DashboardFeature,
   "form-builder.complex": ({ node }) => (
     <FormBuilderFeature operationId={node.actions?.submit ?? ""} />
+  ),
+  "invoice.builder": ({ node }) => (
+    <InvoiceFeature operationId={node.actions?.save ?? ""} />
   ),
   "notifications.screen": NotificationsFeature,
   "profile.screen": ProfileFeature,

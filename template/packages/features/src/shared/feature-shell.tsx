@@ -18,6 +18,7 @@ interface FeatureShellProps {
 const NAVIGATION_ITEMS = [
   { id: "dashboard", label: "Tableau de bord", path: "/" },
   { id: "form-builder", label: "FormBuilder", path: "/formulaire" },
+  { id: "invoice", label: "Factures", path: "/factures" },
   {
     id: "authentication",
     label: "Authentification",

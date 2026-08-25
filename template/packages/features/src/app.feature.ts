@@ -189,6 +189,88 @@ export const FORM_BUILDER_FEATURE = defineFeature({
   version: "1.0.0",
 });
 
+export const INVOICE_FEATURE = defineFeature({
+  blocks: ["invoice.builder"],
+  id: "invoice",
+  operations: [
+    {
+      access: PUBLIC_ACCESS,
+      audit: { event: "invoice.created", required: true },
+      handler: "invoice.create",
+      id: "create",
+      idempotency: { required: true },
+      input: {
+        additionalProperties: false,
+        properties: {
+          clientName: { maxLength: 120, minLength: 2, type: "string" },
+          currency: { enum: ["XAF"], type: "string" },
+          description: { maxLength: 240, minLength: 1, type: "string" },
+          quantity: { maximum: 10_000, minimum: 0.01, type: "number" },
+          taxRate: { maximum: 100, minimum: 0, type: "number" },
+          unitPrice: { maximum: 1_000_000_000, minimum: 0, type: "number" },
+        },
+        required: [
+          "clientName",
+          "currency",
+          "description",
+          "quantity",
+          "taxRate",
+          "unitPrice",
+        ],
+        type: "object",
+      },
+      kind: "mutation",
+      method: "POST",
+      output: {
+        additionalProperties: false,
+        properties: {
+          createdAt: { format: "date-time", type: "string" },
+          id: { format: "uuid", type: "string" },
+          invoiceNumber: { maxLength: 40, minLength: 1, type: "string" },
+          total: { maximum: 20_000_000_000_000, minimum: 0, type: "number" },
+        },
+        required: ["createdAt", "id", "invoiceNumber", "total"],
+        type: "object",
+      },
+      rateLimit: { cost: 1, limit: 20, windowMs: 60_000 },
+      resource: "invoices",
+    },
+  ],
+  pages: [
+    {
+      access: PUBLIC_ACCESS,
+      id: "index",
+      root: {
+        children: [
+          {
+            actions: { save: "create" },
+            block: "invoice.builder",
+            id: "builder",
+            kind: "block",
+          },
+        ],
+        id: "page",
+        kind: "layout",
+        layout: "application.shell",
+      },
+      routes: {
+        mobile: { path: "/factures" },
+        web: {
+          path: "/factures",
+          seo: {
+            canonicalPath: "/factures",
+            description: "Créez et enregistrez une facture de démonstration.",
+            index: false,
+            title: "Mini générateur de facture",
+          },
+        },
+      },
+    },
+  ],
+  schemaVersion: 1,
+  version: "1.0.0",
+});
+
 export const APP_FEATURE_CATALOG = defineFeatureCatalog({
   application: {
     defaultLocale: "fr",
@@ -206,6 +288,7 @@ export const APP_FEATURE_CATALOG = defineFeatureCatalog({
       title: "Tableau de bord",
     }),
     FORM_BUILDER_FEATURE,
+    INVOICE_FEATURE,
     screenFeature({
       access: PUBLIC_ACCESS,
       block: "authentication.screen",

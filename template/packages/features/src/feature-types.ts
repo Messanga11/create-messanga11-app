@@ -2,6 +2,7 @@ export const PRODUCT_FEATURE_IDS = [
   "authentication",
   "dashboard",
   "form-builder",
+  "invoice",
   "notifications",
   "profile",
   "settings",

@@ -4,6 +4,7 @@ import {
   type ActionPrimitiveProps,
   type FeatureLayoutPrimitiveProps,
   type IdentifiedPrimitiveProps,
+  isJsonValue,
   type LabelledPrimitiveProps,
   type NavigationPrimitiveProps,
   type PrimitiveProps,
@@ -145,7 +146,9 @@ function TextField({
     <View style={styles.field}>
       <Text style={styles.fieldLabel}>{label}</Text>
       <TextInput
-        autoCapitalize={inputMode === "email" ? "none" : "sentences"}
+        autoCapitalize={
+          inputMode === "email" || inputMode === "decimal" ? "none" : "sentences"
+        }
         editable={!disabled}
         inputMode={inputMode}
         onChangeText={onChange}
@@ -155,6 +158,25 @@ function TextField({
       />
     </View>
   );
+}
+
+async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
+  const response = await fetch(
+    `${apiUrl}/api/features/${encodeURIComponent(request.featureId)}/${encodeURIComponent(request.operationId)}`,
+    {
+      body: JSON.stringify(request.input),
+      headers: {
+        "content-type": "application/json",
+        "x-idempotency-key": crypto.randomUUID(),
+      },
+      method: "POST",
+    },
+  );
+  if (!response.ok) throw new Error("L’opération a échoué.");
+  const result: unknown = await response.json();
+  if (!isJsonValue(result)) throw new Error("La réponse est invalide.");
+  return result;
 }
 
 function resolveButtonStyle(state: PressableStateCallbackType) {
@@ -178,6 +200,7 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   SectionHeading,
   StatusText,
   TextField,
+  executeMutation,
 });
 
 interface NativeFeatureRendererProps {

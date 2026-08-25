@@ -5,6 +5,7 @@ import {
   type ActionPrimitiveProps,
   type FeatureLayoutPrimitiveProps,
   type IdentifiedPrimitiveProps,
+  isJsonValue,
   type LabelledPrimitiveProps,
   type NavigationPrimitiveProps,
   type PrimitiveProps,
@@ -123,10 +124,29 @@ function TextField({
       disabled,
       inputMode,
       onChange: (event) => onChange(event.currentTarget.value),
-      type: secure ? "password" : inputMode,
+      type: secure ? "password" : inputMode === "decimal" ? "number" : inputMode,
+      ...(inputMode === "decimal" ? { min: "0", step: "0.01" } : {}),
       value,
     }),
   );
+}
+
+async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+  const response = await fetch(
+    `/api/features/${encodeURIComponent(request.featureId)}/${encodeURIComponent(request.operationId)}`,
+    {
+      body: JSON.stringify(request.input),
+      headers: {
+        "content-type": "application/json",
+        "x-idempotency-key": crypto.randomUUID(),
+      },
+      method: "POST",
+    },
+  );
+  if (!response.ok) throw new Error("L’opération a échoué.");
+  const result: unknown = await response.json();
+  if (!isJsonValue(result)) throw new Error("La réponse est invalide.");
+  return result;
 }
 
 const WEB_UI_ENGINE: UiEngine = Object.freeze({
@@ -146,6 +166,7 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
   SectionHeading,
   StatusText,
   TextField,
+  executeMutation,
 });
 
 interface WebFeatureRendererProps {
