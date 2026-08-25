@@ -5,11 +5,14 @@ import {
   type ActionPrimitiveProps,
   type IdentifiedPrimitiveProps,
   type LabelledPrimitiveProps,
+  type NavigationPrimitiveProps,
   type PrimitiveProps,
+  type TextFieldPrimitiveProps,
   type UiEngine,
   UiEngineProvider,
 } from "@starter/ui-engine";
 import { createElement } from "react";
+import { WebFormBuilder } from "./form-builder";
 
 function Page({ children }: PrimitiveProps) {
   return createElement("main", { className: "shell" }, children);
@@ -68,6 +71,56 @@ function ActionButton({ children, disabled, onPress }: ActionPrimitiveProps) {
   );
 }
 
+function NavigationGroup({ children }: PrimitiveProps) {
+  return createElement(
+    "nav",
+    { "aria-label": "Navigation principale", className: "navigation" },
+    children,
+  );
+}
+
+function NavigationAction({ children, current, path }: NavigationPrimitiveProps) {
+  return createElement(
+    "a",
+    {
+      "aria-current": current ? "page" : undefined,
+      className: current
+        ? "navigation-link navigation-link-current"
+        : "navigation-link",
+      href: path,
+    },
+    children,
+  );
+}
+
+function TextField({
+  disabled,
+  inputMode,
+  label,
+  onChange,
+  secure,
+  value,
+}: TextFieldPrimitiveProps) {
+  return createElement(
+    "label",
+    { className: "field" },
+    createElement("span", { className: "field-label" }, label),
+    createElement("input", {
+      autoComplete: secure
+        ? "current-password"
+        : inputMode === "email"
+          ? "email"
+          : "off",
+      className: "field-input",
+      disabled,
+      inputMode,
+      onChange: (event) => onChange(event.currentTarget.value),
+      type: secure ? "password" : inputMode,
+      value,
+    }),
+  );
+}
+
 const WEB_UI_ENGINE: UiEngine = Object.freeze({
   ActionButton,
   Badge,
@@ -75,11 +128,15 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
   CardCopy,
   DisplayHeading,
   Eyebrow,
+  FormBuilder: WebFormBuilder,
   IntroText,
   MetadataText,
+  NavigationAction,
+  NavigationGroup,
   Page,
   SectionHeading,
   StatusText,
+  TextField,
 });
 
 interface WebFeatureRendererProps {

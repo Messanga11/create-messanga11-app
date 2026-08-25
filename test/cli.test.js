@@ -61,14 +61,16 @@ test("scaffolds both applications and pins core", async () => {
   assert.equal(featuresManifest.name, "@starter/features");
   assert.equal(navigationManifest.name, "@starter/navigation");
   assert.equal(routes.app.name, "sample-app");
-  assert.equal(routes.routes.length, 1);
-  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.2\.1/);
+  assert.equal(routes.routes.length, 7);
+  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.3\.1/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);
   assert.match(design, /npm run design:sync/);
   assert.match(design, /@messanga11\/core\/design/);
   await readFile(join(target, "apps/web/src/app/page.tsx"), "utf8");
+  await readFile(join(target, "apps/web/src/app/formulaire/page.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/index.tsx"), "utf8");
+  await readFile(join(target, "apps/mobile/app/formulaire.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/robots.ts"), "utf8");
   await readFile(join(target, "apps/web/src/app/sitemap.ts"), "utf8");
   await readFile(join(target, "apps/web/src/app/manifest.ts"), "utf8");

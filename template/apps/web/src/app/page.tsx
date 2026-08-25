@@ -4,23 +4,23 @@ import { WebFeatureRenderer } from "@starter/ui-web";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "__PROJECT_NAME__",
-  description: "Une logique UI partagée entre le Web et le Mobile.",
+  title: "Tableau de bord",
+  description: "Tableau de bord de démonstration Messanga11.",
   alternates: { canonical: "/" },
-  robots: { index: true, follow: true },
+  robots: { index: false, follow: false },
   openGraph: {
-    title: "__PROJECT_NAME__",
-    description: "Une logique UI partagée entre le Web et le Mobile.",
+    title: "Tableau de bord",
+    description: "Tableau de bord de démonstration Messanga11.",
     type: "website",
     url: "/",
   },
   twitter: {
     card: "summary",
-    title: "__PROJECT_NAME__",
-    description: "Une logique UI partagée entre le Web et le Mobile.",
+    title: "Tableau de bord",
+    description: "Tableau de bord de démonstration Messanga11.",
   },
 };
 
 export default function Page() {
-  return <WebFeatureRenderer featureId="profile" />;
+  return <WebFeatureRenderer featureId="dashboard" />;
 }

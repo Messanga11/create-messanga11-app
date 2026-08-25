@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "__PROJECT_NAME__",
     short_name: "__PROJECT_NAME__",
-    description: "Une logique UI partagée entre le Web et le Mobile.",
+    description: "Démonstration des fonctionnalités partagées Messanga11.",
     start_url: "/",
     display: "standalone",
   };

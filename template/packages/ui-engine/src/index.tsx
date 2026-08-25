@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormDefinition, FormValues } from "@messanga11/core/forms";
 import {
   type ComponentType,
   createContext,
@@ -25,6 +26,26 @@ export interface ActionPrimitiveProps extends PrimitiveProps {
   readonly onPress: () => void;
 }
 
+export interface NavigationPrimitiveProps extends PrimitiveProps {
+  readonly current: boolean;
+  readonly path: string;
+}
+
+export interface TextFieldPrimitiveProps {
+  readonly disabled: boolean;
+  readonly inputMode: "email" | "text";
+  readonly label: string;
+  readonly onChange: (value: string) => void;
+  readonly secure: boolean;
+  readonly value: string;
+}
+
+export interface FormBuilderPrimitiveProps {
+  readonly defaultValues: FormValues;
+  readonly definition: FormDefinition;
+  readonly resource: string;
+}
+
 export interface UiEngine {
   readonly ActionButton: ComponentType<ActionPrimitiveProps>;
   readonly Badge: ComponentType<PrimitiveProps>;
@@ -32,11 +53,15 @@ export interface UiEngine {
   readonly CardCopy: ComponentType<PrimitiveProps>;
   readonly DisplayHeading: ComponentType<PrimitiveProps>;
   readonly Eyebrow: ComponentType<PrimitiveProps>;
+  readonly FormBuilder: ComponentType<FormBuilderPrimitiveProps>;
   readonly IntroText: ComponentType<PrimitiveProps>;
   readonly MetadataText: ComponentType<PrimitiveProps>;
+  readonly NavigationAction: ComponentType<NavigationPrimitiveProps>;
+  readonly NavigationGroup: ComponentType<PrimitiveProps>;
   readonly Page: ComponentType<PrimitiveProps>;
   readonly SectionHeading: ComponentType<IdentifiedPrimitiveProps>;
   readonly StatusText: ComponentType<PrimitiveProps>;
+  readonly TextField: ComponentType<TextFieldPrimitiveProps>;
 }
 
 interface UiEngineProviderProps extends PrimitiveProps {
@@ -89,8 +114,24 @@ export function StatusText(props: PrimitiveProps) {
   return createElement(useUiEngine().StatusText, props);
 }
 
+export function NavigationGroup(props: PrimitiveProps) {
+  return createElement(useUiEngine().NavigationGroup, props);
+}
+
+export function NavigationAction(props: NavigationPrimitiveProps) {
+  return createElement(useUiEngine().NavigationAction, props);
+}
+
+export function TextField(props: TextFieldPrimitiveProps) {
+  return createElement(useUiEngine().TextField, props);
+}
+
 export function ActionButton(props: ActionPrimitiveProps) {
   return createElement(useUiEngine().ActionButton, props);
+}
+
+export function FormBuilder(props: FormBuilderPrimitiveProps) {
+  return createElement(useUiEngine().FormBuilder, props);
 }
 
 function useUiEngine(): UiEngine {

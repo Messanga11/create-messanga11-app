@@ -3,5 +3,5 @@
 import { NativeFeatureRenderer } from "@starter/ui-native";
 
 export default function Screen() {
-  return <NativeFeatureRenderer featureId="profile" />;
+  return <NativeFeatureRenderer featureId="dashboard" />;
 }

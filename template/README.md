@@ -31,6 +31,16 @@ packages/ui-web  Browser engine implementation
 packages/ui-native  React Native engine implementation
 ```
 
+The `/formulaire` feature demonstrates the renderer-neutral FormBuilder with OTP,
+phone, async country choice, roles, conditional fields, repeatable members,
+date range/timezone, document metadata and a review step. Web orchestration uses
+Refine.dev and persists to `.data/demo.sqlite`; Expo submits to the same Next API
+through `EXPO_PUBLIC_API_URL`.
+
+SQLite is development-only. The API validates a strict JSON payload and an
+allowlisted resource. Replace the development adapter and demo identity boundary
+before production deployment.
+
 Design rules and configuration live in `DESIGN.md`. Core provides the defaults;
 change project overrides in `packages/design-system/design.config.json`, then run
 `npm run design:sync`.
