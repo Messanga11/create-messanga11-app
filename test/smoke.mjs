@@ -35,10 +35,7 @@ const catalogPath = join(target, "packages/features/src/app.feature.ts");
 const originalCatalog = await readFile(catalogPath, "utf8");
 const routeMarker = /(id: "dashboard",\s+path: )"\/"/;
 assert.match(originalCatalog, routeMarker);
-const nestedCatalog = originalCatalog.replace(
-  routeMarker,
-  '$1"/account/profile"',
-);
+const nestedCatalog = originalCatalog.replace(routeMarker, '$1"/account/profile"');
 await writeFile(catalogPath, nestedCatalog, "utf8");
 await runNpm(["run", "routes:generate"]);
 await access(join(target, "apps/web/src/app/account/profile/page.tsx"));
