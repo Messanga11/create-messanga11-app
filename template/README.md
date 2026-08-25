@@ -49,8 +49,9 @@ change project overrides in `packages/design-system/design.config.json`, then ru
 Before adding mutations, implement production identity, authorization, quota,
 rate-limit and audit ports in the trusted Web server boundary.
 
-Feature screens are authored once in `packages/features`. Declare each real screen
-in `packages/features/routes.config.json`; do not create page files by hand. The
+Feature screens are authored once in `packages/features`. Declare every feature,
+page, layout, block, route, SEO contract and backend operation in
+`packages/features/src/app.feature.ts`; do not create page or API files by hand. The
 development commands hot-reload this registry and generate the thin Next.js and
 Expo Router adapters without restarting the server:
 
@@ -64,3 +65,8 @@ Each Web declaration contains its truthful title, description, canonical path an
 indexing decision. The generator also maintains `robots.txt`, `sitemap.xml`, the
 Web manifest and framework error/not-found routes. Copy `.env.example` to `.env`
 and set `NEXT_PUBLIC_SITE_URL` to the public Web origin before deployment.
+
+The backend uses the same compiled catalog. Requests to undeclared features or
+operations are rejected. Declared operations enforce method, strict input/output
+schemas, access policy, rate limiting, audit and idempotency before invoking an
+injected handler. SQLite remains a development adapter, not part of the feature API.

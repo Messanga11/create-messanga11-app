@@ -21,7 +21,7 @@ export function NativeFormBuilder(props: FormBuilderPrimitiveProps) {
     <HeadlessFormBuilder
       defaultValues={props.defaultValues}
       definition={props.definition}
-      onSubmit={(values) => submit(props.resource, props.definition.id, values)}
+      onSubmit={(values) => submit(props.featureId, props.operationId, values)}
       renderer={NATIVE_FORM_RENDERER}
     />
   );
@@ -327,23 +327,17 @@ function Action({
 }
 
 async function submit(
-  resource: string,
-  formId: string,
+  featureId: string,
+  operationId: string,
   values: JsonValue,
 ): Promise<void> {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
-  const response = await fetch(`${apiUrl}/api/crud`, {
-    body: JSON.stringify({
-      idempotencyKey: crypto.randomUUID(),
-      resource,
-      values: {
-        createdAt: new Date().toISOString(),
-        formId,
-        payload: values,
-        status: "submitted",
-      },
-    }),
-    headers: { "content-type": "application/json" },
+  const response = await fetch(`${apiUrl}/api/features/${featureId}/${operationId}`, {
+    body: JSON.stringify(values),
+    headers: {
+      "content-type": "application/json",
+      "x-idempotency-key": crypto.randomUUID(),
+    },
     method: "POST",
   });
   if (!response.ok) throw new Error("La sauvegarde a échoué.");

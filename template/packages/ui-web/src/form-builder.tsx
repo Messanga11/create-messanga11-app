@@ -23,16 +23,14 @@ const COUNTRIES = [
 const OTP_CELLS = ["otp-1", "otp-2", "otp-3", "otp-4", "otp-5", "otp-6"] as const;
 
 export function WebFormBuilder(props: FormBuilderPrimitiveProps) {
-  const provider = useMemo(() => createRefineDataProvider(createCrudHttpPort()), []);
+  const provider = useMemo(
+    () => createRefineDataProvider(createCrudHttpPort("/api/features")),
+    [],
+  );
   const submit: FormBuilderProps["onSubmit"] = async (values) => {
     await provider.create({
-      resource: props.resource,
-      variables: {
-        createdAt: new Date().toISOString(),
-        formId: props.definition.id,
-        payload: values,
-        status: "submitted",
-      },
+      resource: `${props.featureId}.${props.operationId}`,
+      variables: values,
     });
   };
   return (

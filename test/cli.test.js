@@ -50,8 +50,9 @@ test("scaffolds both applications and pins core", async () => {
   const navigationManifest = JSON.parse(
     await readFile(join(target, "packages/navigation/package.json"), "utf8"),
   );
-  const routes = JSON.parse(
-    await readFile(join(target, "packages/features/routes.config.json"), "utf8"),
+  const catalog = await readFile(
+    join(target, "packages/features/src/app.feature.ts"),
+    "utf8",
   );
 
   assert.equal(rootManifest.name, "sample-app");
@@ -60,9 +61,9 @@ test("scaffolds both applications and pins core", async () => {
   assert.equal(nativeUiManifest.name, "@starter/ui-native");
   assert.equal(featuresManifest.name, "@starter/features");
   assert.equal(navigationManifest.name, "@starter/navigation");
-  assert.equal(routes.app.name, "sample-app");
-  assert.equal(routes.routes.length, 7);
-  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.3\.1/);
+  assert.match(catalog, /name: "sample-app"/);
+  assert.match(catalog, /FORM_BUILDER_FEATURE/);
+  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.4\.0/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);
   assert.match(design, /npm run design:sync/);

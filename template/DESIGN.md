@@ -103,11 +103,12 @@ Native props. Platform semantics and styles remain isolated in `ui-web` and
   platform primitive. `ui-web` and `ui-native` inject the renderers.
 - Refine.dev is confined to `ui-web` through `@messanga11/adapter-refine`; it is
   never imported by shared features or the Native engine.
-- `packages/features/routes.config.json` declares which shared feature each physical
-  Web and Mobile route renders. It also owns the exact Web title, description,
-  canonical path and indexing decision; the generator never infers product pages.
+- `packages/features/src/app.feature.ts` declares each feature as an immutable tree:
+  pages, Web/Mobile routes, SEO, access, semantic layouts, blocks, data operations
+  and actions. This compiled catalog is the only source used by renderers, route
+  generation and the backend runtime.
 - `apps/*` contain framework layouts and generated route adapters that pass only a
-  `featureId` to the selected engine renderer.
+  `featureId` and `pageId` to the selected engine renderer.
 
 Never branch on platform inside a feature. When a capability differs, express a
 semantic primitive or optional engine capability and implement the difference in
@@ -121,12 +122,12 @@ picker results remain inside their respective engines.
 
 ### Adding an actual page
 
-1. Implement the complete shared screen in `packages/features` with
+1. Implement a renderer-neutral block in `packages/features` with
    `@starter/ui-engine` primitives.
-2. Add its identifier to `FEATURE_IDS` and map it in `FeatureRoot`.
-3. Add exactly the corresponding Web and Mobile paths to
-   `packages/features/routes.config.json`, including truthful Web metadata.
-4. Save the registry while either development server is running: the route is
+2. Register the block identifier once in `FeatureRoot`.
+3. Add the feature object, its pages, layout tree, routes, SEO and protected
+   operations to `packages/features/src/app.feature.ts`.
+4. Save the catalog while either development server is running: the route is
    generated and hot-reloaded immediately. Use `npm run routes:generate` only for
    an explicit one-shot generation.
 

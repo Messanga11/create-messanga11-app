@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./catalog": "./src/app.feature.ts",
     "./profile": "./src/profile/profile-feature.tsx"
   },
   "scripts": {
@@ -13,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@messanga11/core": "https://github.com/Messanga11/core/releases/download/core-v0.3.1/messanga11-core-0.3.1.tgz",
+    "@messanga11/core": "https://github.com/Messanga11/core/releases/download/core-v0.4.0/messanga11-core-0.4.0.tgz",
     "@starter/domain": "0.1.0",
     "@starter/ui-engine": "0.1.0"
   },

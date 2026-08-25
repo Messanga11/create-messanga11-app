@@ -3,6 +3,7 @@
 import { type FeatureId, FeatureRoot } from "@starter/features";
 import {
   type ActionPrimitiveProps,
+  type FeatureLayoutPrimitiveProps,
   type IdentifiedPrimitiveProps,
   type LabelledPrimitiveProps,
   type NavigationPrimitiveProps,
@@ -15,6 +16,13 @@ import { createElement } from "react";
 import { WebFormBuilder } from "./form-builder";
 
 function Page({ children }: PrimitiveProps) {
+  return createElement("main", { className: "shell" }, children);
+}
+
+function FeatureLayout({ children, layout }: FeatureLayoutPrimitiveProps) {
+  if (layout !== "application.shell") {
+    throw new Error(`Unsupported Web feature layout: ${layout}`);
+  }
   return createElement("main", { className: "shell" }, children);
 }
 
@@ -128,6 +136,7 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
   CardCopy,
   DisplayHeading,
   Eyebrow,
+  FeatureLayout,
   FormBuilder: WebFormBuilder,
   IntroText,
   MetadataText,
@@ -141,12 +150,13 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
 
 interface WebFeatureRendererProps {
   readonly featureId: FeatureId;
+  readonly pageId?: string;
 }
 
-export function WebFeatureRenderer({ featureId }: WebFeatureRendererProps) {
+export function WebFeatureRenderer({ featureId, pageId }: WebFeatureRendererProps) {
   return (
     <UiEngineProvider engine={WEB_UI_ENGINE}>
-      <FeatureRoot featureId={featureId} />
+      <FeatureRoot featureId={featureId} {...(pageId ? { pageId } : {})} />
     </UiEngineProvider>
   );
 }

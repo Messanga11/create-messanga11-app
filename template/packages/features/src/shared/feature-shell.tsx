@@ -4,7 +4,6 @@ import {
   IntroText,
   NavigationAction,
   NavigationGroup,
-  Page,
 } from "@starter/ui-engine";
 import type { ReactNode } from "react";
 import type { ProductFeatureId } from "../feature-types";
@@ -37,7 +36,7 @@ export function FeatureShell({
   title,
 }: FeatureShellProps) {
   return (
-    <Page>
+    <>
       <NavigationGroup>
         {NAVIGATION_ITEMS.map((item) => (
           <NavigationAction current={item.id === active} key={item.id} path={item.path}>
@@ -49,6 +48,6 @@ export function FeatureShell({
       <DisplayHeading>{title}</DisplayHeading>
       <IntroText>{description}</IntroText>
       {children}
-    </Page>
+    </>
   );
 }

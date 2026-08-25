@@ -1,5 +1,5 @@
+export { APP_FEATURE_CATALOG } from "./app.feature";
 export {
-  FEATURE_IDS,
   type FeatureId,
   FeatureRoot,
   type FeatureRootProps,

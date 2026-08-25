@@ -2,6 +2,7 @@ import { designTokens } from "@starter/design-system";
 import { type FeatureId, FeatureRoot } from "@starter/features";
 import {
   type ActionPrimitiveProps,
+  type FeatureLayoutPrimitiveProps,
   type IdentifiedPrimitiveProps,
   type LabelledPrimitiveProps,
   type NavigationPrimitiveProps,
@@ -24,6 +25,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeFormBuilder } from "./form-builder";
 
 function Page({ children }: PrimitiveProps) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.shell}>{children}</ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function FeatureLayout({ children, layout }: FeatureLayoutPrimitiveProps) {
+  if (layout !== "application.shell") {
+    throw new Error(`Unsupported Native feature layout: ${layout}`);
+  }
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.shell}>{children}</ScrollView>
@@ -156,6 +168,7 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   CardCopy,
   DisplayHeading,
   Eyebrow,
+  FeatureLayout,
   FormBuilder: NativeFormBuilder,
   IntroText,
   MetadataText,
@@ -169,12 +182,16 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
 
 interface NativeFeatureRendererProps {
   readonly featureId: FeatureId;
+  readonly pageId?: string;
 }
 
-export function NativeFeatureRenderer({ featureId }: NativeFeatureRendererProps) {
+export function NativeFeatureRenderer({
+  featureId,
+  pageId,
+}: NativeFeatureRendererProps) {
   return (
     <UiEngineProvider engine={NATIVE_UI_ENGINE}>
-      <FeatureRoot featureId={featureId} />
+      <FeatureRoot featureId={featureId} {...(pageId ? { pageId } : {})} />
     </UiEngineProvider>
   );
 }

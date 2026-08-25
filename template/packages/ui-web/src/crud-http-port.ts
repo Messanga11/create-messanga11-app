@@ -1,3 +1,4 @@
+import type { JsonValue } from "@messanga11/core";
 import type {
   CrudListRequest,
   CrudListResult,
@@ -7,9 +8,17 @@ import type {
   CrudWriteRequest,
 } from "@messanga11/core/crud";
 
-export function createCrudHttpPort(baseUrl = "/api/crud"): CrudPort {
+export function createCrudHttpPort(baseUrl = "/api/features"): CrudPort {
   return {
-    create: (request) => send<CrudRecord>(baseUrl, "POST", request),
+    create: (request) => {
+      const operation = parseOperationResource(request.resource);
+      return send<CrudRecord>(
+        `${baseUrl}/${operation.featureId}/${operation.operationId}`,
+        "POST",
+        request.values,
+        request.idempotencyKey,
+      );
+    },
     delete: async (request) => {
       await send(
         `${baseUrl}/${encodeURIComponent(request.resource)}/${encodeURIComponent(request.id)}`,
@@ -30,14 +39,18 @@ export function createCrudHttpPort(baseUrl = "/api/crud"): CrudPort {
 async function send<Result>(
   url: string,
   method: "DELETE" | "GET" | "PATCH" | "POST",
-  body?: CrudListRequest | CrudUpdateRequest | CrudWriteRequest | object,
+  body?: CrudListRequest | CrudUpdateRequest | CrudWriteRequest | JsonValue,
+  idempotencyKey?: string,
 ): Promise<Result> {
   const response = await fetch(url, {
     method,
     ...(body
       ? {
           body: JSON.stringify(body),
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            ...(idempotencyKey ? { "x-idempotency-key": idempotencyKey } : {}),
+          },
         }
       : {}),
   });
@@ -45,4 +58,15 @@ async function send<Result>(
     throw new Error("La sauvegarde a échoué.");
   }
   return (await response.json()) as Result;
+}
+
+function parseOperationResource(resource: string): {
+  readonly featureId: string;
+  readonly operationId: string;
+} {
+  const [featureId, operationId, extra] = resource.split(".");
+  if (!featureId || !operationId || extra) {
+    throw new Error("Invalid feature operation resource.");
+  }
+  return { featureId, operationId };
 }

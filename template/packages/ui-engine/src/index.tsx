@@ -1,5 +1,6 @@
 "use client";
 
+import type { JsonValue } from "@messanga11/core";
 import type { FormDefinition, FormValues } from "@messanga11/core/forms";
 import {
   type ComponentType,
@@ -43,7 +44,13 @@ export interface TextFieldPrimitiveProps {
 export interface FormBuilderPrimitiveProps {
   readonly defaultValues: FormValues;
   readonly definition: FormDefinition;
-  readonly resource: string;
+  readonly featureId: string;
+  readonly operationId: string;
+}
+
+export interface FeatureLayoutPrimitiveProps extends PrimitiveProps {
+  readonly layout: string;
+  readonly properties: Readonly<Record<string, JsonValue>>;
 }
 
 export interface UiEngine {
@@ -53,6 +60,7 @@ export interface UiEngine {
   readonly CardCopy: ComponentType<PrimitiveProps>;
   readonly DisplayHeading: ComponentType<PrimitiveProps>;
   readonly Eyebrow: ComponentType<PrimitiveProps>;
+  readonly FeatureLayout: ComponentType<FeatureLayoutPrimitiveProps>;
   readonly FormBuilder: ComponentType<FormBuilderPrimitiveProps>;
   readonly IntroText: ComponentType<PrimitiveProps>;
   readonly MetadataText: ComponentType<PrimitiveProps>;
@@ -132,6 +140,10 @@ export function ActionButton(props: ActionPrimitiveProps) {
 
 export function FormBuilder(props: FormBuilderPrimitiveProps) {
   return createElement(useUiEngine().FormBuilder, props);
+}
+
+export function FeatureLayout(props: FeatureLayoutPrimitiveProps) {
+  return createElement(useUiEngine().FeatureLayout, props);
 }
 
 function useUiEngine(): UiEngine {

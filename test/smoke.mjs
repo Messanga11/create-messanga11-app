@@ -31,17 +31,20 @@ await writeFile(designConfig, "{}\n", "utf8");
 await runNpm(["run", "design:sync"]);
 
 await runNpm(["run", "routes:check"]);
-const routesPath = join(target, "packages/features/routes.config.json");
-const originalRoutes = JSON.parse(await readFile(routesPath, "utf8"));
-const nestedRoutes = structuredClone(originalRoutes);
-nestedRoutes.routes[0].web.path = "/account/profile";
-nestedRoutes.routes[0].mobile.path = "/account/profile";
-await writeFile(routesPath, `${JSON.stringify(nestedRoutes, null, 2)}\n`, "utf8");
+const catalogPath = join(target, "packages/features/src/app.feature.ts");
+const originalCatalog = await readFile(catalogPath, "utf8");
+const routeMarker = /(id: "dashboard",\s+path: )"\/"/;
+assert.match(originalCatalog, routeMarker);
+const nestedCatalog = originalCatalog.replace(
+  routeMarker,
+  '$1"/account/profile"',
+);
+await writeFile(catalogPath, nestedCatalog, "utf8");
 await runNpm(["run", "routes:generate"]);
 await access(join(target, "apps/web/src/app/account/profile/page.tsx"));
 await access(join(target, "apps/mobile/app/account/profile.tsx"));
 await assert.rejects(access(join(target, "apps/web/src/app/page.tsx")));
-await writeFile(routesPath, `${JSON.stringify(originalRoutes, null, 2)}\n`, "utf8");
+await writeFile(catalogPath, originalCatalog, "utf8");
 await runNpm(["run", "routes:generate"]);
 await access(join(target, "apps/web/src/app/page.tsx"));
 await assert.rejects(access(join(target, "apps/web/src/app/account/profile/page.tsx")));

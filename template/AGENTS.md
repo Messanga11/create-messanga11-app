@@ -12,10 +12,12 @@
 - Native rendering and device integrations live in `apps/mobile`.
 - Never write intrinsic JSX elements such as `div`, `span`, `p`, `button`, `input`, `select`, `main` or headings in Web application code. Compose `@starter/ui-web` primitives.
 - Add missing browser semantics once inside `packages/ui-web`, then consume the new universal primitive everywhere.
-- `packages/features/routes.config.json` is the only route and page-metadata source of truth. Declare only product routes that really exist; never invent pages, locale variants or structured data.
+- `packages/features/src/app.feature.ts` is the only source of truth for features, pages, layouts, blocks, routes, SEO and backend operations. Never create a parallel route, permission, schema or resource registry.
+- Every page renders a tree of semantic layout/block identifiers. Engines resolve layouts; the feature block registry resolves blocks. Unknown identifiers fail catalog compilation or render nothing.
+- Every backend call targets `/api/features/{featureId}/{operationId}`. Only operations declared in the catalog may execute; input/output schemas, access, rate limit, audit and idempotency are mandatory server guardrails.
 - `npm run dev:web` and `npm run dev:mobile` hot-reload the registry automatically without restarting the framework server. `npm run routes:watch` runs the same watcher alone.
 - Never edit a file marked as generated under a framework route directory. The generator refuses to overwrite manual files and deletes only paths recorded in `packages/navigation/generated-files.json`.
-- Applications are composition roots only: generated routes pass a `featureId` to `WebFeatureRenderer` or `NativeFeatureRenderer`; never duplicate feature UI in an app.
+- Applications are composition roots only: generated routes pass `featureId` and `pageId` to `WebFeatureRenderer` or `NativeFeatureRenderer`; never duplicate feature UI in an app.
 - Never trust tenant, actor or permissions supplied by a client.
 - Enforce authorization through `@messanga11/core/server`; UI decisions are advisory.
 - Search existing symbols with `rg` and ingest only the closest relevant snippets before creating a pattern.
