@@ -24,7 +24,10 @@ apps/web       Next.js App Router and trusted server composition
 apps/mobile    Expo Router and native rendering
 packages/domain  Shared schemas, policies and semantic view-models
 packages/design-system  Shared semantic tokens for Web and Native
-packages/ui-web  Controlled semantic Web primitives
+packages/features  Shared UI composition, state and actions
+packages/ui-engine  Renderer-neutral primitive contracts
+packages/ui-web  Browser engine implementation
+packages/ui-native  React Native engine implementation
 ```
 
 Design rules and configuration live in `DESIGN.md`. Core provides the defaults;
@@ -34,3 +37,6 @@ change project overrides in `packages/design-system/design.config.json`, then ru
 `@messanga11/core/testing` is suitable only for tests and local prototypes.
 Before adding mutations, implement production identity, authorization, quota,
 rate-limit and audit ports in the trusted Web server boundary.
+
+Feature screens are authored once in `packages/features`. Files inside `apps/*`
+only expose framework layouts and select the matching renderer engine.

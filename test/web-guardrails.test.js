@@ -6,14 +6,42 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const applicationRoot = resolve(root, "template/apps/web/src");
+const featuresRoot = resolve(root, "template/packages/features/src");
 const intrinsicElement =
   /<(?:article|button|div|h[1-6]|input|main|p|section|select|span|textarea)\b/;
 
 test("Web application code uses controlled design-system primitives", async () => {
-  for (const path of await listTypeScriptReactFiles(applicationRoot)) {
+  const sourceFiles = [
+    ...(await listTypeScriptReactFiles(applicationRoot)),
+    ...(await listTypeScriptReactFiles(featuresRoot)),
+  ];
+  for (const path of sourceFiles) {
     const source = await readFile(path, "utf8");
     assert.doesNotMatch(source, intrinsicElement, path);
   }
+});
+
+test("Shared features never import a platform renderer", async () => {
+  for (const path of await listTypeScriptReactFiles(featuresRoot)) {
+    const source = await readFile(path, "utf8");
+    assert.doesNotMatch(
+      source,
+      /react-native|@starter\/ui-(?:native|web)|\bwindow\b|\bdocument\b/,
+      path,
+    );
+  }
+});
+
+test("Applications only select their renderer engine", async () => {
+  const webEntry = await readFile(resolve(applicationRoot, "app/page.tsx"), "utf8");
+  const nativeEntry = await readFile(
+    resolve(root, "template/apps/mobile/app/index.tsx"),
+    "utf8",
+  );
+
+  assert.match(webEntry, /WebEngineRenderer as default/);
+  assert.match(nativeEntry, /NativeEngineRenderer as default/);
+  assert.doesNotMatch(`${webEntry}\n${nativeEntry}`, /useState|UiMeta|ProfileFeature/);
 });
 
 async function listTypeScriptReactFiles(directory) {

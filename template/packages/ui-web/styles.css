@@ -1,3 +1,5 @@
+@import "@starter/design-system/web.css";
+
 :root {
   color-scheme: light;
   font-family: var(--ds-type-body);

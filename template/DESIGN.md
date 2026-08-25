@@ -58,11 +58,11 @@ Web components consume CSS variables after the root layout imports
 }
 ```
 
-Application screens import semantic primitives from
-`@starter/ui-web`. Do not write intrinsic JSX tags directly:
+Shared features import stable primitives from `@starter/ui-engine`. They never
+import a renderer or write platform JSX directly:
 
 ```tsx
-import { ActionButton, Card, SectionHeading } from "@starter/ui-web";
+import { ActionButton, Card, SectionHeading } from "@starter/ui-engine";
 
 <Card labelledBy="account-title">
   <SectionHeading id="account-title">Compte</SectionHeading>
@@ -70,8 +70,9 @@ import { ActionButton, Card, SectionHeading } from "@starter/ui-web";
 </Card>;
 ```
 
-If a semantic primitive is missing, add it once to the Web adapter with a narrow,
-platform-neutral API. Do not expose generic DOM attributes to feature code.
+If a semantic primitive is missing, define its narrow contract in `ui-engine`, then
+implement it in both `ui-web` and `ui-native`. Do not expose DOM or React Native
+attributes to feature code.
 
 Native components import the same JSON-backed values:
 
@@ -86,11 +87,24 @@ const styles = StyleSheet.create({
 });
 ```
 
-Do not share JSX, DOM props or React Native props across platforms. Share tokens,
-policies and semantic view-models; implement accessible components separately in
-`apps/web` and `apps/mobile`.
+Share feature JSX only through `ui-engine` primitives. Never share DOM or React
+Native props. Platform semantics and styles remain isolated in `ui-web` and
+`ui-native`; `apps/web` and `apps/mobile` only select an engine.
 
-## 4. Typography
+## 4. Shared feature architecture
+
+- `packages/features` owns copy, composition, interaction state, `uiMeta` projection
+  and action wiring exactly once.
+- `packages/ui-engine` owns stable primitive contracts and the injected provider.
+- `packages/ui-web` maps those contracts to accessible browser semantics.
+- `packages/ui-native` maps the same contracts to accessible Native primitives.
+- `apps/*` contain framework layouts and export the selected engine renderer only.
+
+Never branch on platform inside a feature. When a capability differs, express a
+semantic primitive or optional engine capability and implement the difference in
+the two renderers.
+
+## 5. Typography
 
 - Use Geist for product UI when the font asset is installed, with Avenir Next and
   platform sans-serif fallbacks during bootstrap.
@@ -101,7 +115,7 @@ policies and semantic view-models; implement accessible components separately in
 - Do not use Inter, generic serif fonts, oversized marketing headlines or gradient
   text in product screens.
 
-## 5. Components and states
+## 6. Components and states
 
 - Buttons have one primary treatment, a minimum 44px target and tactile pressed
   feedback. Disabled controls remain perceivable when a denial reason is useful.
@@ -113,7 +127,7 @@ policies and semantic view-models; implement accessible components separately in
   denied states where applicable.
 - Destructive actions require confirmation and restore focus when the dialog closes.
 
-## 6. Layout and responsiveness
+## 7. Layout and responsiveness
 
 - Start mobile-first. Multi-column layouts collapse below 768px without horizontal
   overflow.
@@ -122,7 +136,7 @@ policies and semantic view-models; implement accessible components separately in
 - Avoid three identical cards in a row. Use hierarchy, offset grids or clear lists.
 - Interactive elements keep at least a 44px target on both platforms.
 
-## 7. Motion and accessibility
+## 8. Motion and accessibility
 
 - Animate only `transform` and `opacity`; use restrained non-linear timing.
 - Respect `prefers-reduced-motion` on Web and the platform reduce-motion setting on
@@ -132,7 +146,7 @@ policies and semantic view-models; implement accessible components separately in
 - Never encode status by color alone. Pair it with text, iconography or shape.
 - Haptics are optional enhancement on Native, never the only feedback channel.
 
-## 8. Banned patterns
+## 9. Banned patterns
 
 No pure black, neon glow, purple AI gradients, excessive shadows, emoji decoration,
 custom cursors, overlapping content, inaccessible icon-only controls, generic names,

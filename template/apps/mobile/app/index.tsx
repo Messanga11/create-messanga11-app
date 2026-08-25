@@ -1,3 +1,1 @@
-import { ProfileScreen } from "../src/profile-screen";
-
-export default ProfileScreen;
+export { NativeEngineRenderer as default } from "@starter/ui-native";
