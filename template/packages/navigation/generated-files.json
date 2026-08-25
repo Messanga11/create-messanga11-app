@@ -1,0 +1,14 @@
+{
+  "files": [
+    "apps/mobile/app/+not-found.tsx",
+    "apps/mobile/app/index.tsx",
+    "apps/web/src/app/error.tsx",
+    "apps/web/src/app/loading.tsx",
+    "apps/web/src/app/manifest.ts",
+    "apps/web/src/app/not-found.tsx",
+    "apps/web/src/app/page.tsx",
+    "apps/web/src/app/robots.ts",
+    "apps/web/src/app/site-url.ts",
+    "apps/web/src/app/sitemap.ts"
+  ]
+}

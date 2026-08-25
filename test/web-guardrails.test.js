@@ -32,15 +32,16 @@ test("Shared features never import a platform renderer", async () => {
   }
 });
 
-test("Applications only select their renderer engine", async () => {
+test("Generated applications only select their renderer engine", async () => {
   const webEntry = await readFile(resolve(applicationRoot, "app/page.tsx"), "utf8");
   const nativeEntry = await readFile(
     resolve(root, "template/apps/mobile/app/index.tsx"),
     "utf8",
   );
 
-  assert.match(webEntry, /WebEngineRenderer as default/);
-  assert.match(nativeEntry, /NativeEngineRenderer as default/);
+  assert.match(webEntry, /WebFeatureRenderer featureId="profile"/);
+  assert.match(nativeEntry, /NativeFeatureRenderer featureId="profile"/);
+  assert.match(webEntry, /export const metadata: Metadata/);
   assert.doesNotMatch(`${webEntry}\n${nativeEntry}`, /useState|UiMeta|ProfileFeature/);
 });
 

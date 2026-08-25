@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@starter/ui-web/styles.css";
+import { getSiteUrl } from "./site-url";
 
 export const metadata: Metadata = {
-  description: "Next.js and Expo starter powered by Messanga11 Core.",
+  metadataBase: getSiteUrl(),
   title: "__PROJECT_NAME__",
 };
 

@@ -1,5 +1,5 @@
 import { designTokens } from "@starter/design-system";
-import { FeatureRoot } from "@starter/features";
+import { type FeatureId, FeatureRoot } from "@starter/features";
 import {
   type ActionPrimitiveProps,
   type IdentifiedPrimitiveProps,
@@ -108,10 +108,14 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   StatusText,
 });
 
-export function NativeEngineRenderer() {
+interface NativeFeatureRendererProps {
+  readonly featureId: FeatureId;
+}
+
+export function NativeFeatureRenderer({ featureId }: NativeFeatureRendererProps) {
   return (
     <UiEngineProvider engine={NATIVE_UI_ENGINE}>
-      <FeatureRoot />
+      <FeatureRoot featureId={featureId} />
     </UiEngineProvider>
   );
 }
