@@ -138,8 +138,9 @@ product brief. Configure the public origin with `NEXT_PUBLIC_SITE_URL`; producti
 must not use the localhost fallback.
 
 The watcher supports editors that save by replacing the file atomically. Rapid
-saves are debounced, a change received during generation is queued, and invalid
-intermediate JSON keeps the last valid pages active until the next valid save.
+saves are debounced, a change received during generation is queued, and an invalid
+intermediate TypeScript definition keeps the last valid pages active until the
+next valid save.
 
 ## 5. Typography
 
