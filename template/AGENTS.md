@@ -13,7 +13,7 @@
 - Never write intrinsic JSX elements such as `div`, `span`, `p`, `button`, `input`, `select`, `main` or headings in Web application code. Compose `@starter/ui-web` primitives.
 - Add missing browser semantics once inside `packages/ui-web`, then consume the new universal primitive everywhere.
 - `packages/features/routes.config.json` is the only route and page-metadata source of truth. Declare only product routes that really exist; never invent pages, locale variants or structured data.
-- Run `npm run routes:generate` after adding or removing a route. `npm run dev:web` and `npm run dev:mobile` watch the registry automatically.
+- `npm run dev:web` and `npm run dev:mobile` hot-reload the registry automatically without restarting the framework server. `npm run routes:watch` runs the same watcher alone.
 - Never edit a file marked as generated under a framework route directory. The generator refuses to overwrite manual files and deletes only paths recorded in `packages/navigation/generated-files.json`.
 - Applications are composition roots only: generated routes pass a `featureId` to `WebFeatureRenderer` or `NativeFeatureRenderer`; never duplicate feature UI in an app.
 - Never trust tenant, actor or permissions supplied by a client.

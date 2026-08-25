@@ -10,6 +10,7 @@
     "dev:web": "node scripts/dev.mjs web",
     "generate": "node scripts/generate-routes.mjs",
     "test": "node --test test/*.test.mjs",
-    "typecheck": "node scripts/generate-routes.mjs --check"
+    "typecheck": "node scripts/generate-routes.mjs --check",
+    "watch": "node scripts/watch-routes.mjs"
   }
 }

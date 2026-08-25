@@ -41,12 +41,13 @@ rate-limit and audit ports in the trusted Web server boundary.
 
 Feature screens are authored once in `packages/features`. Declare each real screen
 in `packages/features/routes.config.json`; do not create page files by hand. The
-development commands watch this registry and generate the thin Next.js and Expo
-Router adapters automatically:
+development commands hot-reload this registry and generate the thin Next.js and
+Expo Router adapters without restarting the server:
 
 ```sh
 npm run routes:generate
 npm run routes:check
+npm run routes:watch
 ```
 
 Each Web declaration contains its truthful title, description, canonical path and

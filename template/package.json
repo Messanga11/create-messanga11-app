@@ -15,6 +15,7 @@
     "dev:web": "npm run dev:web -w @starter/navigation",
     "routes:check": "npm run check -w @starter/navigation",
     "routes:generate": "npm run generate -w @starter/navigation",
+    "routes:watch": "npm run watch -w @starter/navigation",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
