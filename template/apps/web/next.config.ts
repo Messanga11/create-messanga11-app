@@ -11,7 +11,13 @@ const config: NextConfig = {
     return [{ headers: SECURITY_HEADERS, source: "/(.*)" }];
   },
   serverExternalPackages: ["@messanga11/core"],
-  transpilePackages: ["@starter/design-system", "@starter/domain", "@starter/ui-web"],
+  transpilePackages: [
+    "@starter/design-system",
+    "@starter/domain",
+    "@starter/features",
+    "@starter/ui-engine",
+    "@starter/ui-web",
+  ],
 };
 
 export default config;

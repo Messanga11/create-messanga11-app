@@ -41,10 +41,18 @@ test("scaffolds both applications and pins core", async () => {
   const webUiManifest = JSON.parse(
     await readFile(join(target, "packages/ui-web/package.json"), "utf8"),
   );
+  const nativeUiManifest = JSON.parse(
+    await readFile(join(target, "packages/ui-native/package.json"), "utf8"),
+  );
+  const featuresManifest = JSON.parse(
+    await readFile(join(target, "packages/features/package.json"), "utf8"),
+  );
 
   assert.equal(rootManifest.name, "sample-app");
   assert.equal(designManifest.name, "@starter/design-system");
   assert.equal(webUiManifest.name, "@starter/ui-web");
+  assert.equal(nativeUiManifest.name, "@starter/ui-native");
+  assert.equal(featuresManifest.name, "@starter/features");
   assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.2\.1/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);

@@ -1,39 +1,33 @@
-import { createElement, type ReactNode } from "react";
+"use client";
 
-interface ChildrenProps {
-  readonly children: ReactNode;
-}
+import { FeatureRoot } from "@starter/features";
+import {
+  type ActionPrimitiveProps,
+  type IdentifiedPrimitiveProps,
+  type LabelledPrimitiveProps,
+  type PrimitiveProps,
+  type UiEngine,
+  UiEngineProvider,
+} from "@starter/ui-engine";
+import { createElement } from "react";
 
-interface IdentifiedProps extends ChildrenProps {
-  readonly id: string;
-}
-
-interface CardProps extends ChildrenProps {
-  readonly labelledBy: string;
-}
-
-interface ActionButtonProps extends ChildrenProps {
-  readonly disabled?: boolean;
-  readonly onPress: () => void;
-}
-
-export function Page({ children }: ChildrenProps) {
+function Page({ children }: PrimitiveProps) {
   return createElement("main", { className: "shell" }, children);
 }
 
-export function Eyebrow({ children }: ChildrenProps) {
+function Eyebrow({ children }: PrimitiveProps) {
   return createElement("p", { className: "eyebrow" }, children);
 }
 
-export function DisplayHeading({ children }: ChildrenProps) {
+function DisplayHeading({ children }: PrimitiveProps) {
   return createElement("h1", { className: "display-heading" }, children);
 }
 
-export function IntroText({ children }: ChildrenProps) {
+function IntroText({ children }: PrimitiveProps) {
   return createElement("p", { className: "lede" }, children);
 }
 
-export function Card({ children, labelledBy }: CardProps) {
+function Card({ children, labelledBy }: LabelledPrimitiveProps) {
   return createElement(
     "section",
     { "aria-labelledby": labelledBy, className: "card" },
@@ -41,27 +35,27 @@ export function Card({ children, labelledBy }: CardProps) {
   );
 }
 
-export function CardCopy({ children }: ChildrenProps) {
+function CardCopy({ children }: PrimitiveProps) {
   return createElement("div", { className: "card-copy" }, children);
 }
 
-export function Badge({ children }: ChildrenProps) {
+function Badge({ children }: PrimitiveProps) {
   return createElement("span", { className: "badge" }, children);
 }
 
-export function SectionHeading({ children, id }: IdentifiedProps) {
+function SectionHeading({ children, id }: IdentifiedPrimitiveProps) {
   return createElement("h2", { className: "section-heading", id }, children);
 }
 
-export function MetadataText({ children }: ChildrenProps) {
+function MetadataText({ children }: PrimitiveProps) {
   return createElement("p", { className: "metadata" }, children);
 }
 
-export function StatusText({ children }: ChildrenProps) {
+function StatusText({ children }: PrimitiveProps) {
   return createElement("p", { "aria-live": "polite", className: "status" }, children);
 }
 
-export function ActionButton({ children, disabled, onPress }: ActionButtonProps) {
+function ActionButton({ children, disabled, onPress }: ActionPrimitiveProps) {
   return createElement(
     "button",
     {
@@ -71,5 +65,27 @@ export function ActionButton({ children, disabled, onPress }: ActionButtonProps)
       type: "button",
     },
     children,
+  );
+}
+
+const WEB_UI_ENGINE: UiEngine = Object.freeze({
+  ActionButton,
+  Badge,
+  Card,
+  CardCopy,
+  DisplayHeading,
+  Eyebrow,
+  IntroText,
+  MetadataText,
+  Page,
+  SectionHeading,
+  StatusText,
+});
+
+export function WebEngineRenderer() {
+  return (
+    <UiEngineProvider engine={WEB_UI_ENGINE}>
+      <FeatureRoot />
+    </UiEngineProvider>
   );
 }

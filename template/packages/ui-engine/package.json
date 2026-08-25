@@ -1,16 +1,10 @@
 {
-  "name": "@starter/ui-web",
+  "name": "@starter/ui-engine",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.tsx",
-    "./styles.css": "./styles.css"
-  },
-  "dependencies": {
-    "@starter/design-system": "0.1.0",
-    "@starter/features": "0.1.0",
-    "@starter/ui-engine": "0.1.0"
+    ".": "./src/index.tsx"
   },
   "scripts": {
     "build": "tsc --noEmit",

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import "@starter/design-system/web.css";
-import "./styles.css";
+import "@starter/ui-web/styles.css";
 
 export const metadata: Metadata = {
   description: "Next.js and Expo starter powered by Messanga11 Core.",
