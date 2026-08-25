@@ -47,12 +47,21 @@ test("scaffolds both applications and pins core", async () => {
   const featuresManifest = JSON.parse(
     await readFile(join(target, "packages/features/package.json"), "utf8"),
   );
+  const navigationManifest = JSON.parse(
+    await readFile(join(target, "packages/navigation/package.json"), "utf8"),
+  );
+  const routes = JSON.parse(
+    await readFile(join(target, "packages/features/routes.config.json"), "utf8"),
+  );
 
   assert.equal(rootManifest.name, "sample-app");
   assert.equal(designManifest.name, "@starter/design-system");
   assert.equal(webUiManifest.name, "@starter/ui-web");
   assert.equal(nativeUiManifest.name, "@starter/ui-native");
   assert.equal(featuresManifest.name, "@starter/features");
+  assert.equal(navigationManifest.name, "@starter/navigation");
+  assert.equal(routes.app.name, "sample-app");
+  assert.equal(routes.routes.length, 1);
   assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.2\.1/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);
@@ -60,6 +69,9 @@ test("scaffolds both applications and pins core", async () => {
   assert.match(design, /@messanga11\/core\/design/);
   await readFile(join(target, "apps/web/src/app/page.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/index.tsx"), "utf8");
+  await readFile(join(target, "apps/web/src/app/robots.ts"), "utf8");
+  await readFile(join(target, "apps/web/src/app/sitemap.ts"), "utf8");
+  await readFile(join(target, "apps/web/src/app/manifest.ts"), "utf8");
 });
 
 test("refuses to overwrite a non-empty directory", async () => {

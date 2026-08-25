@@ -25,6 +25,7 @@ apps/mobile    Expo Router and native rendering
 packages/domain  Shared schemas, policies and semantic view-models
 packages/design-system  Shared semantic tokens for Web and Native
 packages/features  Shared UI composition, state and actions
+packages/navigation  Validated Web/Mobile route and SEO generator
 packages/ui-engine  Renderer-neutral primitive contracts
 packages/ui-web  Browser engine implementation
 packages/ui-native  React Native engine implementation
@@ -38,5 +39,17 @@ change project overrides in `packages/design-system/design.config.json`, then ru
 Before adding mutations, implement production identity, authorization, quota,
 rate-limit and audit ports in the trusted Web server boundary.
 
-Feature screens are authored once in `packages/features`. Files inside `apps/*`
-only expose framework layouts and select the matching renderer engine.
+Feature screens are authored once in `packages/features`. Declare each real screen
+in `packages/features/routes.config.json`; do not create page files by hand. The
+development commands watch this registry and generate the thin Next.js and Expo
+Router adapters automatically:
+
+```sh
+npm run routes:generate
+npm run routes:check
+```
+
+Each Web declaration contains its truthful title, description, canonical path and
+indexing decision. The generator also maintains `robots.txt`, `sitemap.xml`, the
+Web manifest and framework error/not-found routes. Copy `.env.example` to `.env`
+and set `NEXT_PUBLIC_SITE_URL` to the public Web origin before deployment.

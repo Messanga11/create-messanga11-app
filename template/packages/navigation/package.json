@@ -1,0 +1,15 @@
+{
+  "name": "@starter/navigation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/generate-routes.mjs --check",
+    "check": "node scripts/generate-routes.mjs --check",
+    "dev:mobile": "node scripts/dev.mjs mobile",
+    "dev:web": "node scripts/dev.mjs web",
+    "generate": "node scripts/generate-routes.mjs",
+    "test": "node --test test/*.test.mjs",
+    "typecheck": "node scripts/generate-routes.mjs --check"
+  }
+}

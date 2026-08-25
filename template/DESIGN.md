@@ -98,11 +98,30 @@ Native props. Platform semantics and styles remain isolated in `ui-web` and
 - `packages/ui-engine` owns stable primitive contracts and the injected provider.
 - `packages/ui-web` maps those contracts to accessible browser semantics.
 - `packages/ui-native` maps the same contracts to accessible Native primitives.
-- `apps/*` contain framework layouts and export the selected engine renderer only.
+- `packages/features/routes.config.json` declares which shared feature each physical
+  Web and Mobile route renders. It also owns the exact Web title, description,
+  canonical path and indexing decision; the generator never infers product pages.
+- `apps/*` contain framework layouts and generated route adapters that pass only a
+  `featureId` to the selected engine renderer.
 
 Never branch on platform inside a feature. When a capability differs, express a
 semantic primitive or optional engine capability and implement the difference in
 the two renderers.
+
+### Adding an actual page
+
+1. Implement the complete shared screen in `packages/features` with
+   `@starter/ui-engine` primitives.
+2. Add its identifier to `FEATURE_IDS` and map it in `FeatureRoot`.
+3. Add exactly the corresponding Web and Mobile paths to
+   `packages/features/routes.config.json`, including truthful Web metadata.
+4. Run `npm run routes:generate` or keep either development server running.
+
+The generator creates physical App Router and Expo Router files, plus the Web
+canonical metadata, robots directives and sitemap entries. Do not add SEO claims,
+locales, Open Graph images, JSON-LD entities or routes that are not present in the
+product brief. Configure the public origin with `NEXT_PUBLIC_SITE_URL`; production
+must not use the localhost fallback.
 
 ## 5. Typography
 

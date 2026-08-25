@@ -1,6 +1,6 @@
 "use client";
 
-import { FeatureRoot } from "@starter/features";
+import { type FeatureId, FeatureRoot } from "@starter/features";
 import {
   type ActionPrimitiveProps,
   type IdentifiedPrimitiveProps,
@@ -82,10 +82,14 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
   StatusText,
 });
 
-export function WebEngineRenderer() {
+interface WebFeatureRendererProps {
+  readonly featureId: FeatureId;
+}
+
+export function WebFeatureRenderer({ featureId }: WebFeatureRendererProps) {
   return (
     <UiEngineProvider engine={WEB_UI_ENGINE}>
-      <FeatureRoot />
+      <FeatureRoot featureId={featureId} />
     </UiEngineProvider>
   );
 }
