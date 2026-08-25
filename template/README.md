@@ -23,7 +23,12 @@ with the LAN address of the machine running Next.js.
 apps/web       Next.js App Router and trusted server composition
 apps/mobile    Expo Router and native rendering
 packages/domain  Shared schemas, policies and semantic view-models
+packages/design-system  Shared semantic tokens for Web and Native
 ```
+
+Design rules and configuration live in `DESIGN.md`. Core provides the defaults;
+change project overrides in `packages/design-system/design.config.json`, then run
+`npm run design:sync`.
 
 `@messanga11/core/testing` is suitable only for tests and local prototypes.
 Before adding mutations, implement production identity, authorization, quota,

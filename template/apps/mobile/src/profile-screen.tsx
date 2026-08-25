@@ -1,10 +1,14 @@
 import { canPerform } from "@messanga11/core";
+import { designTokens } from "@starter/design-system";
 import { buildProfileUiMeta } from "@starter/domain";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const UI_META = buildProfileUiMeta(["profile:read", "profile:update"]);
+const CARD_RADIUS = designTokens.radius.card;
+const PILL_RADIUS = designTokens.radius.pill;
+const SPACE_MD = designTokens.spacing.md;
 
 export function ProfileScreen() {
   const [message, setMessage] = useState("Prêt à construire.");
@@ -43,7 +47,7 @@ export function ProfileScreen() {
 
 const styles = StyleSheet.create({
   badge: {
-    color: "#2d6a4f",
+    color: designTokens.color.accent,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 0.8,
@@ -51,32 +55,36 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#171714",
-    borderRadius: 999,
+    backgroundColor: designTokens.color.ink,
+    borderRadius: PILL_RADIUS,
     justifyContent: "center",
     marginTop: 24,
     minHeight: 50,
     paddingHorizontal: 20,
   },
-  buttonLabel: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
+  buttonLabel: {
+    color: designTokens.color.accentContrast,
+    fontSize: 16,
+    fontWeight: "700",
+  },
   card: {
-    backgroundColor: "#fffef9",
-    borderColor: "#d8d4ca",
-    borderRadius: 18,
+    backgroundColor: designTokens.color.surface,
+    borderColor: designTokens.color.border,
+    borderRadius: CARD_RADIUS,
     borderWidth: 1,
     marginTop: 40,
-    padding: 24,
+    padding: SPACE_MD,
   },
   cardTitle: {
-    color: "#171714",
+    color: designTokens.color.ink,
     fontSize: 23,
     fontWeight: "700",
     marginTop: 12,
   },
   disabledButton: {
     alignItems: "center",
-    backgroundColor: "#171714",
-    borderRadius: 999,
+    backgroundColor: designTokens.color.ink,
+    borderRadius: PILL_RADIUS,
     justifyContent: "center",
     marginTop: 24,
     minHeight: 50,
@@ -84,18 +92,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   eyebrow: {
-    color: "#68645c",
+    color: designTokens.color.muted,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1.6,
   },
-  lede: { color: "#57534b", fontSize: 17, lineHeight: 25, marginTop: 16 },
-  meta: { color: "#68645c", marginTop: 8 },
-  safeArea: { backgroundColor: "#f4f2ed", flex: 1 },
-  shell: { flex: 1, paddingHorizontal: 24, paddingTop: 36 },
-  status: { color: "#57534b", marginTop: 18, minHeight: 22 },
+  lede: {
+    color: designTokens.color.body,
+    fontSize: 17,
+    lineHeight: 25,
+    marginTop: 16,
+  },
+  meta: { color: designTokens.color.muted, marginTop: 8 },
+  safeArea: { backgroundColor: designTokens.color.canvas, flex: 1 },
+  shell: { flex: 1, paddingHorizontal: SPACE_MD, paddingTop: 36 },
+  status: { color: designTokens.color.body, marginTop: 18, minHeight: 22 },
   title: {
-    color: "#171714",
+    color: designTokens.color.ink,
     fontSize: 44,
     fontWeight: "800",
     letterSpacing: -2,

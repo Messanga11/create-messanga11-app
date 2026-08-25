@@ -1,5 +1,6 @@
+import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -13,13 +14,32 @@ const target = await scaffoldProject({
   projectName: "smoke-app",
 });
 
+await runNpm(["install"]);
+
+const designRoot = join(target, "packages/design-system");
+const designConfig = join(designRoot, "design.config.json");
+await writeFile(
+  designConfig,
+  `${JSON.stringify({ color: { accent: "#315d55" }, spacing: { md: 28 } })}\n`,
+  "utf8",
+);
+await runNpm(["run", "design:sync"]);
+const configuredCss = await readFile(join(designRoot, "web.css"), "utf8");
+assert.match(configuredCss, /--ds-color-accent: #315d55;/);
+assert.match(configuredCss, /--ds-spacing-md: 28px;/);
+await writeFile(designConfig, "{}\n", "utf8");
+await runNpm(["run", "design:sync"]);
+
 for (const argumentsList of [
-  ["install"],
   ["run", "typecheck"],
   ["test"],
   ["run", "build:web"],
   ["run", "build:mobile"],
 ]) {
+  await runNpm(argumentsList);
+}
+
+async function runNpm(argumentsList) {
   const { stdout, stderr } = await execFileAsync("npm", argumentsList, {
     cwd: target,
     maxBuffer: 20 * 1024 * 1024,
