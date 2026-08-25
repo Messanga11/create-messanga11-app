@@ -1,8 +1,12 @@
 "use client";
 
+import type { FeatureBlockNode, FeatureNode } from "@messanga11/core/features";
+import { compileFeatureCatalog } from "@messanga11/core/features";
+import { FeatureLayout } from "@starter/ui-engine";
+import type { ComponentType, ReactNode } from "react";
+import { APP_FEATURE_CATALOG, type AppFeatureId } from "./app.feature";
 import { AuthenticationFeature } from "./authentication/authentication-feature";
 import { DashboardFeature } from "./dashboard/dashboard-feature";
-import { PRODUCT_FEATURE_IDS } from "./feature-types";
 import { FormBuilderFeature } from "./form-builder/form-builder-feature";
 import { NotificationsFeature } from "./notifications/notifications-feature";
 import { ProfileFeature } from "./profile/profile-feature";
@@ -10,37 +14,53 @@ import { SettingsFeature } from "./settings/settings-feature";
 import { SystemFeature } from "./system/system-feature";
 import { TeamFeature } from "./team/team-feature";
 
-export const FEATURE_IDS = [
-  ...PRODUCT_FEATURE_IDS,
-  "system-error",
-  "system-loading",
-  "system-not-found",
-] as const;
+const COMPILED_CATALOG = compileFeatureCatalog(APP_FEATURE_CATALOG);
+const BLOCKS: Readonly<
+  Record<string, ComponentType<{ readonly node: FeatureBlockNode }>>
+> = {
+  "authentication.screen": AuthenticationFeature,
+  "dashboard.screen": DashboardFeature,
+  "form-builder.complex": ({ node }) => (
+    <FormBuilderFeature operationId={node.actions?.submit ?? ""} />
+  ),
+  "notifications.screen": NotificationsFeature,
+  "profile.screen": ProfileFeature,
+  "settings.screen": SettingsFeature,
+  "team.screen": TeamFeature,
+};
 
-export type FeatureId = (typeof FEATURE_IDS)[number];
+export type FeatureId =
+  | AppFeatureId
+  | "system-error"
+  | "system-loading"
+  | "system-not-found";
 
 export interface FeatureRootProps {
   readonly featureId: FeatureId;
+  readonly pageId?: string;
 }
 
-// SOT[feature-registry]: Every generated route resolves through this explicit registry.
-export function FeatureRoot({ featureId }: FeatureRootProps) {
-  switch (featureId) {
-    case "authentication":
-      return <AuthenticationFeature />;
-    case "dashboard":
-      return <DashboardFeature />;
-    case "form-builder":
-      return <FormBuilderFeature />;
-    case "notifications":
-      return <NotificationsFeature />;
-    case "profile":
-      return <ProfileFeature />;
-    case "settings":
-      return <SettingsFeature />;
-    case "team":
-      return <TeamFeature />;
-    default:
-      return <SystemFeature featureId={featureId} />;
+export function FeatureRoot({ featureId, pageId = "index" }: FeatureRootProps) {
+  if (featureId.startsWith("system-")) {
+    return (
+      <SystemFeature
+        featureId={featureId as "system-error" | "system-loading" | "system-not-found"}
+      />
+    );
   }
+  const page = COMPILED_CATALOG.pages[`${featureId}.${pageId}`];
+  if (!page) return <SystemFeature featureId="system-not-found" />;
+  return renderNode(page.root);
+}
+
+function renderNode(node: FeatureNode): ReactNode {
+  if (node.kind === "block") {
+    const Block = BLOCKS[node.block];
+    return Block ? <Block key={node.id} node={node} /> : null;
+  }
+  return (
+    <FeatureLayout key={node.id} layout={node.layout} properties={node.props ?? {}}>
+      {node.children.map(renderNode)}
+    </FeatureLayout>
+  );
 }

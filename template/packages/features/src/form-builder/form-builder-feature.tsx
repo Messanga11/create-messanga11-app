@@ -159,7 +159,7 @@ const DEFAULT_VALUES: FormValues = {
   roles: ["admin"],
 };
 
-export function FormBuilderFeature() {
+export function FormBuilderFeature({ operationId }: Readonly<{ operationId: string }>) {
   return (
     <FeatureShell
       active="form-builder"
@@ -169,7 +169,8 @@ export function FormBuilderFeature() {
       <FormBuilder
         defaultValues={DEFAULT_VALUES}
         definition={TEAM_FORM}
-        resource="form_submissions"
+        featureId="form-builder"
+        operationId={operationId}
       />
     </FeatureShell>
   );

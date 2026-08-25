@@ -27,7 +27,7 @@ test("coalesces rapid route edits into one regeneration", async () => {
 
 test("watches atomic config saves and recovers after an invalid edit", async () => {
   const directory = await mkdtemp(join(tmpdir(), "routes-watch-"));
-  const configPath = join(directory, "routes.config.json");
+  const configPath = join(directory, "app.feature.ts");
   await writeFile(configPath, "{}\n", "utf8");
   let attempts = 0;
   const recovered = deferred();
@@ -36,7 +36,7 @@ test("watches atomic config saves and recovers after an invalid edit", async () 
     debounceMs: 10,
     generate: async () => {
       attempts += 1;
-      if (attempts === 1) throw new Error("temporary invalid JSON");
+      if (attempts === 1) throw new Error("temporary invalid feature definition");
     },
     onGenerated: recovered.resolve,
   });

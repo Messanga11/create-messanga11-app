@@ -8,6 +8,7 @@
     "apps/mobile/app/notifications.tsx",
     "apps/mobile/app/parametres.tsx",
     "apps/mobile/app/profil.tsx",
+    "apps/web/src/app/api/features/[featureId]/[operationId]/route.ts",
     "apps/web/src/app/authentification/page.tsx",
     "apps/web/src/app/equipe/page.tsx",
     "apps/web/src/app/error.tsx",

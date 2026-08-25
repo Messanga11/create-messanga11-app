@@ -87,7 +87,7 @@ if (import.meta.url === invokedPath) {
     onError: reportError,
     onGenerated: () => process.stdout.write("Routes hot-reloaded.\n"),
   });
-  process.stdout.write("Watching routes.config.json for hot reload.\n");
+  process.stdout.write("Watching app.feature.ts for hot reload.\n");
   const stop = () => hotReload.close();
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);

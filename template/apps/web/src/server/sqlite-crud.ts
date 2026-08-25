@@ -18,7 +18,43 @@ database.exec(`
     status TEXT NOT NULL,
     createdAt TEXT NOT NULL
   )
+  ;
+  CREATE TABLE IF NOT EXISTS feature_audit (
+    id TEXT PRIMARY KEY,
+    actorId TEXT,
+    event TEXT NOT NULL,
+    operation TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    requestId TEXT NOT NULL,
+    tenantId TEXT,
+    createdAt TEXT NOT NULL
+  )
 `);
+
+const insertAudit = database.prepare(`
+  INSERT INTO feature_audit (id, actorId, event, operation, outcome, requestId, tenantId, createdAt)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`);
+
+export function writeFeatureAudit(event: {
+  readonly actorId?: string;
+  readonly event: string;
+  readonly operation: string;
+  readonly outcome: string;
+  readonly requestId: string;
+  readonly tenantId?: string;
+}): void {
+  insertAudit.run(
+    crypto.randomUUID(),
+    event.actorId ?? null,
+    event.event,
+    event.operation,
+    event.outcome,
+    event.requestId,
+    event.tenantId ?? null,
+    new Date().toISOString(),
+  );
+}
 
 export const sqliteCrud = createSqliteCrudAdapter({
   database,
