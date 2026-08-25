@@ -3,6 +3,15 @@
 import { canPerform, type UiMeta } from "@messanga11/core";
 import type { PolicyDenialCode } from "@messanga11/core/policy";
 import type { ProfileAction } from "@starter/domain";
+import {
+  ActionButton,
+  Badge,
+  Card,
+  CardCopy,
+  MetadataText,
+  SectionHeading,
+  StatusText,
+} from "@starter/ui-web";
 import { useState } from "react";
 
 interface ProfileCardProps {
@@ -14,22 +23,19 @@ export function ProfileCard({ uiMeta }: ProfileCardProps) {
   const canEdit = canPerform(uiMeta, "edit");
 
   return (
-    <section aria-labelledby="profile-title" className="card">
-      <div>
-        <span className="badge">Core connecté</span>
-        <h2 id="profile-title">Profil de démonstration</h2>
-        <p>Policy revision : {uiMeta.revision}</p>
-      </div>
-      <button
+    <Card labelledBy="profile-title">
+      <CardCopy>
+        <Badge>Core connecté</Badge>
+        <SectionHeading id="profile-title">Profil de démonstration</SectionHeading>
+        <MetadataText>Policy revision : {uiMeta.revision}</MetadataText>
+      </CardCopy>
+      <ActionButton
         disabled={!canEdit}
-        onClick={() => setMessage("Action UI reçue. Branche maintenant ton API.")}
-        type="button"
+        onPress={() => setMessage("Action UI reçue. Branche maintenant ton API.")}
       >
         Modifier le profil
-      </button>
-      <p aria-live="polite" className="status">
-        {message}
-      </p>
-    </section>
+      </ActionButton>
+      <StatusText>{message}</StatusText>
+    </Card>
   );
 }
