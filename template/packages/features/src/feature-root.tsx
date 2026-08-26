@@ -11,6 +11,7 @@ import { FormBuilderFeature } from "./form-builder/form-builder-feature";
 import { InvoiceFeature } from "./invoice/invoice-feature";
 import { NotificationsFeature } from "./notifications/notifications-feature";
 import { ProfileFeature } from "./profile/profile-feature";
+import { ResourceFeature } from "./resources/resource-feature";
 import { SettingsFeature } from "./settings/settings-feature";
 import { SystemFeature } from "./system/system-feature";
 import { TeamFeature } from "./team/team-feature";
@@ -20,7 +21,7 @@ const BLOCKS: Readonly<
   Record<string, ComponentType<{ readonly node: FeatureBlockNode }>>
 > = {
   "authentication.screen": AuthenticationFeature,
-  "dashboard.screen": DashboardFeature,
+  "dashboard.screen": ({ node }) => <DashboardFeature node={node} />,
   "form-builder.complex": ({ node }) => (
     <FormBuilderFeature operationId={node.actions?.submit ?? ""} />
   ),
@@ -29,6 +30,7 @@ const BLOCKS: Readonly<
   ),
   "notifications.screen": NotificationsFeature,
   "profile.screen": ProfileFeature,
+  "resource.list": ({ node }) => <ResourceFeature node={node} />,
   "settings.screen": SettingsFeature,
   "team.screen": TeamFeature,
 };

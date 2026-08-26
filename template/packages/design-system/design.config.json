@@ -1,1 +1,23 @@
-{}
+{
+  "color": {
+    "accent": "#f26a3d",
+    "body": "#4f4f4f",
+    "border": "#f0f0f0",
+    "canvas": "#f5f5f5",
+    "danger": "#c43d3d",
+    "ink": "#1f1f1f",
+    "muted": "#8c8c8c",
+    "surface": "#ffffff"
+  },
+  "radius": {
+    "card": 8,
+    "control": 6
+  },
+  "spacing": {
+    "lg": 32,
+    "md": 24,
+    "sm": 12,
+    "xl": 48,
+    "xs": 8
+  }
+}

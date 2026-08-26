@@ -1,0 +1,92 @@
+import type { AnalyticsDashboardPrimitiveProps } from "@starter/ui-engine";
+
+export const DASHBOARD_DEMO = {
+  metrics: [
+    {
+      id: "revenue",
+      kind: "line",
+      label: "Daily Revenue",
+      trend: "+12.5%",
+      value: "80,00 $US",
+      values: [900, 1080, 1230, 1350, 720, 1120, 1080],
+    },
+    {
+      id: "orders",
+      kind: "bar",
+      label: "Daily Orders",
+      trend: "+8.2%",
+      value: "150",
+      values: [34, 39, 52, 52, 30, 40, 45],
+    },
+    {
+      id: "customers",
+      kind: "bar",
+      label: "New Customers",
+      trend: "+11.0%",
+      value: "11 000,00 %",
+      values: [13, 21, 22, 18, 20, 30, 25],
+    },
+  ],
+  orders: [
+    {
+      address: "11855 Boyle Burg, Brooklyn, NY 11107",
+      amount: "24,50 $US",
+      customer: "Jaren Heaney",
+      id: "#921270",
+      products: ["Cupcake ×1", "Crispy Calamari ×1", "Veggie Burger ×1"],
+    },
+    {
+      address: "11419 Harvey Streets, Massapequa, NY",
+      amount: "28,00 $US",
+      customer: "Brandyn Stehr",
+      id: "#846599",
+      products: ["Cheeseburger ×1", "Edamame ×1", "Pappardelle ×1"],
+    },
+    {
+      address: "11617 Crooks Expressway, Lindenhurst, NY",
+      amount: "18,00 $US",
+      customer: "Bethany Klein",
+      id: "#450029",
+      products: ["Salmon ×1"],
+    },
+    {
+      address: "11207 Sanford Canyon, Massapequa, NY",
+      amount: "54,50 $US",
+      customer: "Conor Lang",
+      id: "#980786",
+      products: ["Salmon ×1", "Waldorf Salad ×1", "Lasagna ×1"],
+    },
+    {
+      address: "11583 Oswald Station, Lindenhurst, NY",
+      amount: "11,00 $US",
+      customer: "Claire Kovacek",
+      id: "#427238",
+      products: ["Impossible Burger ×1"],
+    },
+    {
+      address: "11685 Ludie Highway, Lindenhurst, NY",
+      amount: "42,50 $US",
+      customer: "Juana Tremblay",
+      id: "#691292",
+      products: ["Brownie ×1", "Spaghetti Carbonara ×1"],
+    },
+  ],
+  period: "Last Week",
+  timeline: [
+    { age: "9 hours ago", id: "#939285", status: "On the way", tone: "info" },
+    { age: "10 hours ago", id: "#921270", status: "Pending", tone: "warning" },
+    { age: "10 hours ago", id: "#606154", status: "Cancelled", tone: "danger" },
+    { age: "11 hours ago", id: "#679907", status: "On the way", tone: "info" },
+    { age: "11 hours ago", id: "#565779", status: "Delivered", tone: "success" },
+    { age: "11 hours ago", id: "#104860", status: "Delivered", tone: "success" },
+    { age: "11 hours ago", id: "#145131", status: "Ready", tone: "neutral" },
+    { age: "13 hours ago", id: "#996290", status: "Cancelled", tone: "danger" },
+  ],
+  trending: [
+    { id: "turkey-burger", name: "Turkey Burger", orders: 52, price: "494,00 $US" },
+    { id: "ravioli", name: "Ravioli", orders: 52, price: "754,00 $US" },
+    { id: "nicoise-salad", name: "Nicoise Salad", orders: 50, price: "650,00 $US" },
+    { id: "chocolate-cake", name: "Chocolate Cake", orders: 48, price: "336,00 $US" },
+    { id: "cupcake", name: "Cupcake", orders: 47, price: "141,00 $US" },
+  ],
+} as const satisfies AnalyticsDashboardPrimitiveProps;

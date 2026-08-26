@@ -1,4 +1,7 @@
+import type { JsonValue } from "@messanga11/core";
 import { defineFeature, defineFeatureCatalog } from "@messanga11/core/features";
+import { DASHBOARD_DEMO } from "./demo-data/dashboard.ts";
+import { RESOURCE_DEMOS } from "./demo-data/resources.ts";
 import type { ProductFeatureId } from "./feature-types";
 
 const PUBLIC_ACCESS = { mode: "public" } as const;
@@ -14,6 +17,7 @@ function screenFeature<
     readonly description: string;
     readonly id: string;
     readonly path: string;
+    readonly props?: Readonly<Record<string, JsonValue>>;
     readonly title: string;
   },
 >(options: Options) {
@@ -26,7 +30,14 @@ function screenFeature<
         access: options.access,
         id: "index",
         root: {
-          children: [{ block: options.block, id: "content", kind: "block" }],
+          children: [
+            {
+              block: options.block,
+              id: "content",
+              kind: "block",
+              ...(options.props ? { props: options.props } : {}),
+            },
+          ],
           id: "page",
           kind: "layout",
           layout: "application.shell",
@@ -285,7 +296,62 @@ export const APP_FEATURE_CATALOG = defineFeatureCatalog({
       description: "Tableau de bord de démonstration Messanga11.",
       id: "dashboard",
       path: "/",
+      props: DASHBOARD_DEMO,
       title: "Tableau de bord",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Liste et suivi des commandes.",
+      id: "orders",
+      path: "/orders",
+      props: RESOURCE_DEMOS.orders,
+      title: "Orders",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Répertoire des clients.",
+      id: "customers",
+      path: "/customers",
+      props: RESOURCE_DEMOS.customers,
+      title: "Customers",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Catalogue des produits.",
+      id: "products",
+      path: "/products",
+      props: RESOURCE_DEMOS.products,
+      title: "Products",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Organisation des catégories produits.",
+      id: "categories",
+      path: "/categories",
+      props: RESOURCE_DEMOS.categories,
+      title: "Categories",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Réseau des points de vente.",
+      id: "stores",
+      path: "/stores",
+      props: RESOURCE_DEMOS.stores,
+      title: "Stores",
+    }),
+    screenFeature({
+      access: AUTHENTICATED_ACCESS,
+      block: "resource.list",
+      description: "Disponibilité et activité des coursiers.",
+      id: "couriers",
+      path: "/couriers",
+      props: RESOURCE_DEMOS.couriers,
+      title: "Couriers",
     }),
     FORM_BUILDER_FEATURE,
     INVOICE_FEATURE,

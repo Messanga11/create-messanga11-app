@@ -1,10 +1,4 @@
-import {
-  DisplayHeading,
-  Eyebrow,
-  IntroText,
-  NavigationAction,
-  NavigationGroup,
-} from "@starter/ui-engine";
+import { AdminShell, DisplayHeading, Eyebrow, IntroText } from "@starter/ui-engine";
 import type { ReactNode } from "react";
 import type { ProductFeatureId } from "../feature-types";
 
@@ -12,43 +6,50 @@ interface FeatureShellProps {
   readonly active: ProductFeatureId;
   readonly children: ReactNode;
   readonly description: string;
+  readonly showIntro?: boolean;
   readonly title: string;
 }
 
 const NAVIGATION_ITEMS = [
-  { id: "dashboard", label: "Tableau de bord", path: "/" },
-  { id: "form-builder", label: "FormBuilder", path: "/formulaire" },
-  { id: "invoice", label: "Factures", path: "/factures" },
+  { icon: "dashboard", id: "dashboard", label: "Dashboard", path: "/" },
+  { icon: "orders", id: "orders", label: "Orders", path: "/orders" },
+  { icon: "customers", id: "customers", label: "Customers", path: "/customers" },
+  { icon: "products", id: "products", label: "Products", path: "/products" },
+  { icon: "categories", id: "categories", label: "Categories", path: "/categories" },
+  { icon: "stores", id: "stores", label: "Stores", path: "/stores" },
+  { icon: "couriers", id: "couriers", label: "Couriers", path: "/couriers" },
+  { icon: "invoices", id: "invoice", label: "Invoices", path: "/factures" },
+  { icon: "forms", id: "form-builder", label: "FormBuilder", path: "/formulaire" },
+  { icon: "team", id: "team", label: "Team", path: "/equipe" },
   {
+    icon: "notifications",
+    id: "notifications",
+    label: "Notifications",
+    path: "/notifications",
+  },
+  { icon: "settings", id: "settings", label: "Settings", path: "/parametres" },
+  {
+    icon: "authentication",
     id: "authentication",
     label: "Authentification",
     path: "/authentification",
   },
-  { id: "profile", label: "Profil", path: "/profil" },
-  { id: "notifications", label: "Notifications", path: "/notifications" },
-  { id: "team", label: "Équipe", path: "/equipe" },
-  { id: "settings", label: "Paramètres", path: "/parametres" },
+  { icon: "profile", id: "profile", label: "Profile", path: "/profil" },
 ] as const;
 
 export function FeatureShell({
   active,
   children,
   description,
+  showIntro = true,
   title,
 }: FeatureShellProps) {
   return (
-    <>
-      <NavigationGroup>
-        {NAVIGATION_ITEMS.map((item) => (
-          <NavigationAction current={item.id === active} key={item.id} path={item.path}>
-            {item.label}
-          </NavigationAction>
-        ))}
-      </NavigationGroup>
-      <Eyebrow>MESSANGA11 DEMO</Eyebrow>
-      <DisplayHeading>{title}</DisplayHeading>
-      <IntroText>{description}</IntroText>
+    <AdminShell active={active} navigation={NAVIGATION_ITEMS}>
+      {showIntro ? <Eyebrow>MESSANGA11 DEMO</Eyebrow> : null}
+      {showIntro ? <DisplayHeading>{title}</DisplayHeading> : null}
+      {showIntro ? <IntroText>{description}</IntroText> : null}
       {children}
-    </>
+    </AdminShell>
   );
 }
