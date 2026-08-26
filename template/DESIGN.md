@@ -7,22 +7,24 @@ before changing UI in either application.
 
 ## 1. Visual theme
 
-The default atmosphere is restrained, warm and product-focused: balanced density,
-clear asymmetric hierarchy and quiet motion. Interfaces should feel intentional,
-not decorative. Use negative space before adding containers or visual effects.
+The demo uses the Refine Finefoods admin language: a white application frame,
+light-gray work canvas, coral action accent, compact navigation and dense data
+views. Borders carry structure; shadows remain absent. Web reproduces the fixed
+sidebar and analytical grids, while Native projects the same feature declarations
+into scrollable cards and lists sized for touch.
 
 ## 2. Token configuration
 
-The palette uses warm neutrals and one forest accent:
+The configured demo palette uses neutral grays and one coral accent:
 
-- **Canvas** (`#f4f2ed`) — application background.
-- **Surface** (`#fffef9`) — elevated or grouped content.
-- **Ink** (`#171714`) — primary text and primary controls; never pure black.
-- **Body** (`#57534b`) — paragraphs and supporting copy.
-- **Muted** (`#68645c`) — metadata; it must still meet contrast requirements.
-- **Border** (`#d8d4ca`) — structural separators.
-- **Accent** (`#2d6a4f`) — the only brand accent, used for focus and active states.
-- **Danger** (`#a33a32`) — destructive feedback only, never branding.
+- **Canvas** (`#f5f5f5`) — application workspace.
+- **Surface** (`#ffffff`) — navigation, header, cards and tables.
+- **Ink** (`#1f1f1f`) — primary text.
+- **Body** (`#4f4f4f`) — paragraphs and supporting copy.
+- **Muted** (`#8c8c8c`) — metadata and inactive controls.
+- **Border** (`#f0f0f0`) — structural separators.
+- **Accent** (`#f26a3d`) — brand, focus and primary actions.
+- **Danger** (`#c43d3d`) — destructive feedback only.
 
 To configure the system:
 

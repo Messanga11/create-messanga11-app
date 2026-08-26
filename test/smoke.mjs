@@ -14,7 +14,7 @@ const target = await scaffoldProject({
   projectName: "smoke-app",
 });
 
-await runNpm(["install"]);
+await runNpm(["install", "--no-audit", "--no-fund"]);
 
 const designRoot = join(target, "packages/design-system");
 const designConfig = join(designRoot, "design.config.json");

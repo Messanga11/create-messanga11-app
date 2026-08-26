@@ -15,6 +15,17 @@ test("generates pages, SEO and the backend route from the feature catalog", asyn
     /Mini générateur de facture/,
   );
   assert.ok(files.has("apps/mobile/app/factures.tsx"));
+  for (const route of [
+    "categories",
+    "couriers",
+    "customers",
+    "orders",
+    "products",
+    "stores",
+  ]) {
+    assert.ok(files.has(`apps/web/src/app/${route}/page.tsx`));
+    assert.ok(files.has(`apps/mobile/app/${route}.tsx`));
+  }
   assert.ok(
     files.has("apps/web/src/app/api/features/[featureId]/[operationId]/route.ts"),
   );

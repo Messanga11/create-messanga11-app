@@ -2,12 +2,15 @@ import { designTokens } from "@starter/design-system";
 import { type FeatureId, FeatureRoot } from "@starter/features";
 import {
   type ActionPrimitiveProps,
+  type AdminShellPrimitiveProps,
+  type AnalyticsDashboardPrimitiveProps,
   type FeatureLayoutPrimitiveProps,
   type IdentifiedPrimitiveProps,
   isJsonValue,
   type LabelledPrimitiveProps,
   type NavigationPrimitiveProps,
   type PrimitiveProps,
+  type ResourceListPrimitiveProps,
   type TextFieldPrimitiveProps,
   type UiEngine,
   UiEngineProvider,
@@ -23,6 +26,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  NativeAdminShell,
+  NativeAnalyticsDashboard,
+  NativeResourceList,
+} from "./admin";
 import { NativeFormBuilder } from "./form-builder";
 
 function Page({ children }: PrimitiveProps) {
@@ -37,11 +45,19 @@ function FeatureLayout({ children, layout }: FeatureLayoutPrimitiveProps) {
   if (layout !== "application.shell") {
     throw new Error(`Unsupported Native feature layout: ${layout}`);
   }
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.shell}>{children}</ScrollView>
-    </SafeAreaView>
-  );
+  return children;
+}
+
+function AdminShell(props: AdminShellPrimitiveProps) {
+  return <NativeAdminShell {...props} />;
+}
+
+function AnalyticsDashboard(props: AnalyticsDashboardPrimitiveProps) {
+  return <NativeAnalyticsDashboard {...props} />;
+}
+
+function ResourceList(props: ResourceListPrimitiveProps) {
+  return <NativeResourceList {...props} />;
 }
 
 function Eyebrow({ children }: PrimitiveProps) {
@@ -184,6 +200,8 @@ function resolveButtonStyle(state: PressableStateCallbackType) {
 }
 
 const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
+  AdminShell,
+  AnalyticsDashboard,
   ActionButton,
   Badge,
   Card,
@@ -197,6 +215,7 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   NavigationAction,
   NavigationGroup,
   Page,
+  ResourceList,
   SectionHeading,
   StatusText,
   TextField,

@@ -71,9 +71,11 @@ test("scaffolds both applications and pins core", async () => {
   await readFile(join(target, "apps/web/src/app/page.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/formulaire/page.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/factures/page.tsx"), "utf8");
+  await readFile(join(target, "apps/web/src/app/products/page.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/index.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/formulaire.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/factures.tsx"), "utf8");
+  await readFile(join(target, "apps/mobile/app/products.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/robots.ts"), "utf8");
   await readFile(join(target, "apps/web/src/app/sitemap.ts"), "utf8");
   await readFile(join(target, "apps/web/src/app/manifest.ts"), "utf8");
