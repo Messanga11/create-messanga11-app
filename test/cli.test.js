@@ -63,7 +63,7 @@ test("scaffolds both applications and pins core", async () => {
   assert.equal(navigationManifest.name, "@starter/navigation");
   assert.match(catalog, /name: "sample-app"/);
   assert.match(catalog, /FORM_BUILDER_FEATURE/);
-  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.4\.0/);
+  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.5\.0/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);
   assert.match(design, /npm run design:sync/);

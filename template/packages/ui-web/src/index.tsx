@@ -336,12 +336,44 @@ function Pagination() {
 
 function ResourceList({
   columns,
+  editor,
   emptyLabel,
+  errorLabel,
+  onCreate,
+  onDelete,
+  onEdit,
+  onRetry,
   primaryAction,
   rows,
+  state,
   title,
   viewModes,
 }: ResourceListPrimitiveProps) {
+  if (state === "loading")
+    return (
+      <section aria-busy="true" className="resource-page">
+        <div className="page-toolbar">
+          <h1>{title}</h1>
+        </div>
+        <p className="resource-feedback">Loading…</p>
+      </section>
+    );
+  if (state === "error")
+    return (
+      <section className="resource-page">
+        <div className="page-toolbar">
+          <h1>{title}</h1>
+        </div>
+        <p className="resource-feedback" role="alert">
+          {errorLabel ?? "Unable to load."}
+        </p>
+        {onRetry ? (
+          <button className="primary-toolbar-button" onClick={onRetry} type="button">
+            Retry
+          </button>
+        ) : null}
+      </section>
+    );
   return (
     <section className="resource-page">
       <div className="page-toolbar">
@@ -356,13 +388,60 @@ function ResourceList({
               <button type="button">⊞</button>
             </fieldset>
           ) : null}
-          {primaryAction ? (
-            <button className="primary-toolbar-button" type="button">
+          {primaryAction && onCreate ? (
+            <button
+              className="primary-toolbar-button"
+              disabled={state === "submitting"}
+              onClick={onCreate}
+              type="button"
+            >
               ＋ {primaryAction}
             </button>
           ) : null}
         </div>
       </div>
+      {editor ? (
+        <div
+          aria-labelledby="resource-editor-title"
+          aria-modal="true"
+          className="resource-editor"
+          role="dialog"
+        >
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              editor.onSubmit();
+            }}
+          >
+            <h2 id="resource-editor-title">{editor.title}</h2>
+            {editor.fields.map((field) => (
+              <label className="field" key={field.id}>
+                <span className="field-label">{field.label}</span>
+                <input
+                  className="field-input"
+                  disabled={state === "submitting"}
+                  onChange={(event) => field.onChange(event.currentTarget.value)}
+                  required
+                  type="text"
+                  value={field.value}
+                />
+              </label>
+            ))}
+            <div className="resource-editor-actions">
+              <button onClick={editor.onCancel} type="button">
+                Cancel
+              </button>
+              <button
+                className="primary-toolbar-button"
+                disabled={state === "submitting"}
+                type="submit"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
       <div className="resource-table-wrap">
         <table className="resource-table">
           <thead>
@@ -404,13 +483,28 @@ function ResourceList({
                     );
                   })}
                   <td>
-                    <button
-                      aria-label={`More actions for ${row.id}`}
-                      className="more-button"
-                      type="button"
-                    >
-                      ⋮
-                    </button>
+                    <div className="row-actions">
+                      {onEdit ? (
+                        <button
+                          aria-label={`Edit ${row.id}`}
+                          onClick={() => onEdit(row.id)}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                      ) : null}
+                      {onDelete ? (
+                        <button
+                          aria-label={`Delete ${row.id}`}
+                          onClick={() => {
+                            if (window.confirm("Delete this record?")) onDelete(row.id);
+                          }}
+                          type="button"
+                        >
+                          Delete
+                        </button>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -534,7 +628,7 @@ function TextField({
   );
 }
 
-async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+async function executeOperation(request: Parameters<UiEngine["executeOperation"]>[0]) {
   const response = await fetch(
     `/api/features/${encodeURIComponent(request.featureId)}/${encodeURIComponent(request.operationId)}`,
     {
@@ -543,13 +637,17 @@ async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[
         "content-type": "application/json",
         "x-idempotency-key": crypto.randomUUID(),
       },
-      method: "POST",
+      method: request.method,
     },
   );
   if (!response.ok) throw new Error("L’opération a échoué.");
   const result: unknown = await response.json();
   if (!isJsonValue(result)) throw new Error("La réponse est invalide.");
   return result;
+}
+
+function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+  return executeOperation({ ...request, method: "POST" });
 }
 
 const WEB_UI_ENGINE: UiEngine = Object.freeze({
@@ -573,6 +671,7 @@ const WEB_UI_ENGINE: UiEngine = Object.freeze({
   StatusText,
   TextField,
   executeMutation,
+  executeOperation,
 });
 
 interface WebFeatureRendererProps {

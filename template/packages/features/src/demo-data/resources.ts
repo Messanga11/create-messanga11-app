@@ -57,7 +57,10 @@ export const RESOURCE_DEMOS = {
     rows: [
       {
         cells: {
-          courier: { secondary: "courier1@finefoods.co", value: "Albert Flores" },
+          courier: {
+            secondary: "courier1@finefoods.co",
+            value: "Albert Flores",
+          },
           deliveries: { value: "128" },
           phone: { value: "+1 202 555 0148" },
           status: { tone: "info", value: "On delivery" },
@@ -106,7 +109,10 @@ export const RESOURCE_DEMOS = {
       },
       {
         cells: {
-          customer: { secondary: "bethany@example.com", value: "Bethany Klein" },
+          customer: {
+            secondary: "bethany@example.com",
+            value: "Bethany Klein",
+          },
           orders: { value: "12" },
           phone: { value: "+1 212 555 0113" },
           spent: { value: "$842.50" },
@@ -136,7 +142,7 @@ export const RESOURCE_DEMOS = {
       { id: "created", label: "CreatedAt" },
     ],
     emptyLabel: "No orders",
-    primaryAction: "Export",
+    primaryAction: "Add order",
     rows: [
       {
         cells: {

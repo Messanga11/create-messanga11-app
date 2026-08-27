@@ -1,6 +1,11 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { createSqliteCrudAdapter } from "@messanga11/adapter-sqlite";
+import {
+  createSqliteCrudAdapter,
+  createSqliteFeatureResourceAdapter,
+} from "@messanga11/adapter-sqlite";
+import { compileFeatureCatalog } from "@messanga11/core/features";
+import { APP_FEATURE_CATALOG } from "@starter/features/catalog";
 import Database from "better-sqlite3";
 
 const DATABASE_PATH = join(process.cwd(), ".data", "demo.sqlite");
@@ -86,4 +91,20 @@ export const sqliteCrud = createSqliteCrudAdapter({
       table: "invoices",
     },
   },
+});
+
+const COMPILED_CATALOG = compileFeatureCatalog(APP_FEATURE_CATALOG);
+
+// SOT[feature-resource-storage]: SQLite derives its complete allowlist and development seed from the catalog.
+export const sqliteFeatureResources = createSqliteFeatureResourceAdapter({
+  database,
+  resources: Object.fromEntries(
+    Object.entries(COMPILED_CATALOG.resources).map(([key, resource]) => [
+      key,
+      {
+        fields: Object.keys(resource.fields),
+        ...(resource.seed ? { seed: resource.seed } : {}),
+      },
+    ]),
+  ),
 });

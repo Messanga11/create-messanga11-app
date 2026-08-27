@@ -124,8 +124,25 @@ export interface ResourceListPrimitiveProps {
   readonly emptyLabel: string;
   readonly primaryAction?: string;
   readonly rows: readonly ResourceRow[];
+  readonly state?: "error" | "loading" | "ready" | "submitting";
   readonly title: string;
   readonly viewModes?: boolean;
+  readonly editor?: {
+    readonly fields: readonly {
+      readonly id: string;
+      readonly label: string;
+      readonly value: string;
+      readonly onChange: (value: string) => void;
+    }[];
+    readonly onCancel: () => void;
+    readonly onSubmit: () => void;
+    readonly title: string;
+  };
+  readonly errorLabel?: string;
+  readonly onCreate?: () => void;
+  readonly onDelete?: (id: string) => void;
+  readonly onEdit?: (id: string) => void;
+  readonly onRetry?: () => void;
 }
 
 export interface TextFieldPrimitiveProps {
@@ -145,6 +162,14 @@ export interface FeatureMutationRequest {
 
 export type FeatureMutationExecutor = (
   request: FeatureMutationRequest,
+) => Promise<JsonValue>;
+
+export interface FeatureOperationRequest extends FeatureMutationRequest {
+  readonly method: "DELETE" | "PATCH" | "POST";
+}
+
+export type FeatureOperationExecutor = (
+  request: FeatureOperationRequest,
 ) => Promise<JsonValue>;
 
 export interface FormBuilderPrimitiveProps {
@@ -180,6 +205,7 @@ export interface UiEngine {
   readonly StatusText: ComponentType<PrimitiveProps>;
   readonly TextField: ComponentType<TextFieldPrimitiveProps>;
   readonly executeMutation: FeatureMutationExecutor;
+  readonly executeOperation: FeatureOperationExecutor;
 }
 
 interface UiEngineProviderProps extends PrimitiveProps {
@@ -270,6 +296,10 @@ export function FeatureLayout(props: FeatureLayoutPrimitiveProps) {
 
 export function useFeatureMutation(): FeatureMutationExecutor {
   return useUiEngine().executeMutation;
+}
+
+export function useFeatureOperation(): FeatureOperationExecutor {
+  return useUiEngine().executeOperation;
 }
 
 export function isJsonValue(value: unknown): value is JsonValue {

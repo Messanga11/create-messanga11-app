@@ -1,19 +1,21 @@
 import type { JsonValue } from "@messanga11/core";
 import {
+  createFeatureCrudHandlers,
   executeFeatureOperation,
   type FeatureBackendPorts,
+  type FeatureOperationHandler,
   type FeatureOperationInvocation,
 } from "@messanga11/core/feature-server";
 import { compileFeatureCatalog } from "@messanga11/core/features";
 import { calculateInvoiceAmounts } from "@starter/domain";
 import { APP_FEATURE_CATALOG } from "@starter/features/catalog";
-import { sqliteCrud, writeFeatureAudit } from "./sqlite-crud";
+import { sqliteCrud, sqliteFeatureResources, writeFeatureAudit } from "./sqlite-crud";
 
 const MAX_BODY_BYTES = 1_000_000;
 const CATALOG = compileFeatureCatalog(APP_FEATURE_CATALOG);
 const RATE_LIMITS = new Map<string, { count: number; resetsAt: number }>();
 
-const PORTS: FeatureBackendPorts = {
+const BASE_PORTS: FeatureBackendPorts = {
   audit: async (event) => writeFeatureAudit(event),
   authorize: async ({ context, operation }) =>
     operation.access.mode === "authenticated" &&
@@ -21,6 +23,7 @@ const PORTS: FeatureBackendPorts = {
       context.permissions.has(permission),
     ),
   handlers: {
+    ...createFeatureCrudHandlers(sqliteFeatureResources),
     "form-builder.submit": submitForm,
     "invoice.create": createInvoice,
   },
@@ -28,9 +31,48 @@ const PORTS: FeatureBackendPorts = {
     consumeRateLimit(`${context.rateLimitKey ?? "anonymous"}:${operation}`, policy),
 };
 
+export interface FeatureBackendExtension {
+  readonly handlers?: Readonly<Record<string, FeatureOperationHandler>>;
+  readonly identity?: (request: Request) => FeatureIdentity | Promise<FeatureIdentity>;
+  readonly ports?: Partial<
+    Pick<FeatureBackendPorts, "audit" | "authorize" | "rateLimit" | "reportError">
+  >;
+}
+
+export interface FeatureIdentity {
+  readonly actorId?: string;
+  readonly permissions: ReadonlySet<string>;
+  readonly tenantId?: string;
+}
+
+// MICROCONTEXT[feature-backend-extension]: Production composition injects identity, policy, telemetry and custom handlers here.
+export function createFeatureRequestHandler(extension: FeatureBackendExtension = {}) {
+  const ports: FeatureBackendPorts = {
+    ...BASE_PORTS,
+    ...extension.ports,
+    handlers: mergeHandlers(BASE_PORTS.handlers, extension.handlers ?? {}),
+  };
+  const identity = extension.identity ?? resolveIdentity;
+  return async (
+    request: Request,
+    params: { readonly featureId: string; readonly operationId: string },
+  ): Promise<Response> => executeRequest(request, params, ports, identity);
+}
+
+const DEFAULT_REQUEST_HANDLER = createFeatureRequestHandler();
+
 export async function handleFeatureRequest(
   request: Request,
   params: { readonly featureId: string; readonly operationId: string },
+): Promise<Response> {
+  return DEFAULT_REQUEST_HANDLER(request, params);
+}
+
+async function executeRequest(
+  request: Request,
+  params: { readonly featureId: string; readonly operationId: string },
+  ports: FeatureBackendPorts,
+  identity: (request: Request) => FeatureIdentity | Promise<FeatureIdentity>,
 ): Promise<Response> {
   if (!request.headers.get("content-type")?.startsWith("application/json")) {
     return Response.json({ code: "INVALID_INPUT" }, { status: 415 });
@@ -44,7 +86,7 @@ export async function handleFeatureRequest(
   const result = await executeFeatureOperation({
     catalog: CATALOG,
     context: {
-      permissions: new Set<string>(),
+      ...(await identity(request)),
       rateLimitKey: readClientKey(request),
       requestId,
     },
@@ -55,7 +97,7 @@ export async function handleFeatureRequest(
     input,
     method: request.method,
     operationId: params.operationId,
-    ports: PORTS,
+    ports,
   });
   if (result.status === "success") return Response.json(result.data, { status: 200 });
   return Response.json(
@@ -71,6 +113,25 @@ export async function handleFeatureRequest(
       status: statusFor(result.code),
     },
   );
+}
+
+function resolveIdentity(): FeatureIdentity {
+  if (process.env.NODE_ENV === "production") return { permissions: new Set() };
+  return {
+    actorId: "demo-user",
+    permissions: new Set(["application:read", "application:write"]),
+    tenantId: "demo-tenant",
+  };
+}
+
+function mergeHandlers(
+  builtIn: Readonly<Record<string, FeatureOperationHandler>>,
+  extensions: Readonly<Record<string, FeatureOperationHandler>>,
+): Readonly<Record<string, FeatureOperationHandler>> {
+  for (const id of Object.keys(extensions)) {
+    if (builtIn[id]) throw new TypeError(`Feature handler already registered: ${id}`);
+  }
+  return Object.freeze({ ...builtIn, ...extensions });
 }
 
 async function submitForm(invocation: FeatureOperationInvocation) {

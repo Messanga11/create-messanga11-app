@@ -6,6 +6,8 @@ interface RouteContext {
   readonly params: Promise<{ readonly featureId: string; readonly operationId: string }>;
 }
 
-export async function POST(request: Request, context: RouteContext): Promise<Response> {
+async function dispatch(request: Request, context: RouteContext): Promise<Response> {
   return handleFeatureRequest(request, await context.params);
 }
+
+export { dispatch as DELETE, dispatch as GET, dispatch as PATCH, dispatch as POST };
