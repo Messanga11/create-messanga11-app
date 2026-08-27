@@ -1018,6 +1018,45 @@ body {
   border-top: 1px solid var(--ds-color-border);
   padding: 10px 16px;
 }
+.resource-feedback {
+  padding: 32px;
+  color: var(--ds-color-muted);
+}
+.resource-editor {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(31 31 31 / 42%);
+}
+.resource-editor form {
+  width: min(520px, 100%);
+  max-height: 88vh;
+  overflow: auto;
+  padding: 24px;
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-surface);
+}
+.resource-editor form h2 {
+  margin: 0 0 20px;
+}
+.resource-editor-actions,
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.resource-editor-actions {
+  margin-top: 20px;
+}
+.row-actions button {
+  min-height: 36px;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-control);
+  background: var(--ds-color-surface);
+}
 .resource-cell {
   display: grid;
   gap: 4px;

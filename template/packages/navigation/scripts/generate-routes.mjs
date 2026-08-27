@@ -130,7 +130,7 @@ function renderMobileSystem() {
 }
 
 function renderFeatureApiRoute() {
-  return `${GENERATED_HEADER}import { handleFeatureRequest } from "../../../../../server/feature-backend";\n\ninterface RouteContext {\n  readonly params: Promise<{ readonly featureId: string; readonly operationId: string }>;\n}\n\nexport async function POST(request: Request, context: RouteContext): Promise<Response> {\n  return handleFeatureRequest(request, await context.params);\n}\n`;
+  return `${GENERATED_HEADER}import { handleFeatureRequest } from "../../../../../server/feature-backend";\n\ninterface RouteContext {\n  readonly params: Promise<{ readonly featureId: string; readonly operationId: string }>;\n}\n\nasync function dispatch(request: Request, context: RouteContext): Promise<Response> {\n  return handleFeatureRequest(request, await context.params);\n}\n\nexport { dispatch as DELETE, dispatch as GET, dispatch as PATCH, dispatch as POST };\n`;
 }
 
 function renderRobots() {

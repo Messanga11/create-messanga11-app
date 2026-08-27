@@ -6,7 +6,16 @@ import type {
   StatusTone,
 } from "@starter/ui-engine";
 import { type Href, Link } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const SELECTED_STATE = { selected: true } as const;
@@ -128,44 +137,142 @@ export function NativeAnalyticsDashboard({
 
 export function NativeResourceList({
   columns,
+  editor,
+  emptyLabel,
+  errorLabel,
+  onCreate,
+  onDelete,
+  onEdit,
+  onRetry,
   primaryAction,
   rows,
+  state,
   title,
 }: ResourceListPrimitiveProps) {
+  if (state === "loading")
+    return (
+      <View style={styles.feedback}>
+        <ActivityIndicator />
+        <Text style={styles.muted}>Loading…</Text>
+      </View>
+    );
+  if (state === "error")
+    return (
+      <View style={styles.feedback}>
+        <Text accessibilityLiveRegion="assertive">
+          {errorLabel ?? "Unable to load."}
+        </Text>
+        {onRetry ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={onRetry}
+            style={styles.primaryButton}
+          >
+            <Text style={styles.primaryButtonText}>Retry</Text>
+          </Pressable>
+        ) : null}
+      </View>
+    );
   return (
     <View>
       <View style={styles.pageHeader}>
         <Text accessibilityRole="header" style={styles.pageTitle}>
           {title}
         </Text>
-        {primaryAction ? (
-          <Pressable accessibilityRole="button" style={styles.primaryButton}>
+        {primaryAction && onCreate ? (
+          <Pressable
+            accessibilityRole="button"
+            disabled={state === "submitting"}
+            onPress={onCreate}
+            style={styles.primaryButton}
+          >
             <Text style={styles.primaryButtonText}>＋ {primaryAction}</Text>
           </Pressable>
         ) : null}
       </View>
-      {rows.map((row) => (
-        <View key={row.id} style={styles.card}>
-          {columns.map((column) => {
-            const cell = row.cells[column.id];
-            return (
-              <View key={column.id} style={styles.resourceRow}>
-                <Text style={styles.muted}>{column.label}</Text>
-                {cell?.tone ? (
-                  <NativeStatus tone={cell.tone} value={cell.value} />
-                ) : (
-                  <View style={styles.alignEnd}>
-                    <Text style={styles.rowId}>{cell?.value ?? "—"}</Text>
-                    {cell?.secondary ? (
-                      <Text style={styles.muted}>{cell.secondary}</Text>
-                    ) : null}
-                  </View>
-                )}
-              </View>
-            );
-          })}
+      {editor ? (
+        <View accessibilityRole="summary" style={styles.card}>
+          <Text accessibilityRole="header" style={styles.cardTitle}>
+            {editor.title}
+          </Text>
+          {editor.fields.map((field) => (
+            <View key={field.id} style={styles.editorField}>
+              <Text style={styles.muted}>{field.label}</Text>
+              <TextInput
+                editable={state !== "submitting"}
+                onChangeText={field.onChange}
+                style={styles.editorInput}
+                value={field.value}
+              />
+            </View>
+          ))}
+          <View style={styles.editorActions}>
+            <Pressable onPress={editor.onCancel} style={styles.secondaryButton}>
+              <Text>Cancel</Text>
+            </Pressable>
+            <Pressable
+              disabled={state === "submitting"}
+              onPress={editor.onSubmit}
+              style={styles.primaryButton}
+            >
+              <Text style={styles.primaryButtonText}>Save</Text>
+            </Pressable>
+          </View>
         </View>
-      ))}
+      ) : null}
+      {rows.length === 0 ? (
+        <Text style={styles.feedback}>{emptyLabel}</Text>
+      ) : (
+        rows.map((row) => (
+          <View key={row.id} style={styles.card}>
+            {columns.map((column) => {
+              const cell = row.cells[column.id];
+              return (
+                <View key={column.id} style={styles.resourceRow}>
+                  <Text style={styles.muted}>{column.label}</Text>
+                  {cell?.tone ? (
+                    <NativeStatus tone={cell.tone} value={cell.value} />
+                  ) : (
+                    <View style={styles.alignEnd}>
+                      <Text style={styles.rowId}>{cell?.value ?? "—"}</Text>
+                      {cell?.secondary ? (
+                        <Text style={styles.muted}>{cell.secondary}</Text>
+                      ) : null}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+            <View style={styles.editorActions}>
+              {onEdit ? (
+                <Pressable
+                  onPress={() => onEdit(row.id)}
+                  style={styles.secondaryButton}
+                >
+                  <Text>Edit</Text>
+                </Pressable>
+              ) : null}
+              {onDelete ? (
+                <Pressable
+                  onPress={() =>
+                    Alert.alert("Delete record?", "This action cannot be undone.", [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: () => onDelete(row.id),
+                      },
+                    ])
+                  }
+                  style={styles.secondaryButton}
+                >
+                  <Text>Delete</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+        ))
+      )}
     </View>
   );
 }
@@ -260,6 +367,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   currentLinkText: { color: designTokens.color.accent, fontWeight: "700" },
+  editorActions: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "flex-end",
+    marginTop: 12,
+  },
+  editorField: { gap: 6, marginBottom: 12 },
+  editorInput: {
+    borderColor: designTokens.color.border,
+    borderRadius: designTokens.radius.control,
+    borderWidth: 1,
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
+  feedback: { alignItems: "center", gap: 12, padding: 32 },
   grow: { flex: 1 },
   link: {
     justifyContent: "center",
@@ -311,7 +434,10 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: 12,
   },
-  primaryButtonText: { color: designTokens.color.accentContrast, fontWeight: "700" },
+  primaryButtonText: {
+    color: designTokens.color.accentContrast,
+    fontWeight: "700",
+  },
   rank: {
     color: designTokens.color.accent,
     fontSize: 18,
@@ -326,16 +452,46 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     minHeight: 54,
   },
+  secondaryButton: {
+    alignItems: "center",
+    borderColor: designTokens.color.border,
+    borderRadius: 6,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
   rowId: { color: designTokens.color.ink, fontWeight: "700" },
   safeArea: { backgroundColor: designTokens.color.canvas, flex: 1 },
-  sparkline: { color: "#4389ee", fontSize: 40, letterSpacing: 2, marginTop: 16 },
-  statusDanger: { ...baseStatus, backgroundColor: "#fff1f1", borderColor: "#efb2b2" },
+  sparkline: {
+    color: "#4389ee",
+    fontSize: 40,
+    letterSpacing: 2,
+    marginTop: 16,
+  },
+  statusDanger: {
+    ...baseStatus,
+    backgroundColor: "#fff1f1",
+    borderColor: "#efb2b2",
+  },
   statusDangerText: { color: "#bd3838", fontSize: 12 },
-  statusInfo: { ...baseStatus, backgroundColor: "#edf7ff", borderColor: "#9bc8ef" },
+  statusInfo: {
+    ...baseStatus,
+    backgroundColor: "#edf7ff",
+    borderColor: "#9bc8ef",
+  },
   statusInfoText: { color: "#246da9", fontSize: 12 },
-  statusSuccess: { ...baseStatus, backgroundColor: "#f3ffe9", borderColor: "#b7df9c" },
+  statusSuccess: {
+    ...baseStatus,
+    backgroundColor: "#f3ffe9",
+    borderColor: "#b7df9c",
+  },
   statusSuccessText: { color: "#4e9227", fontSize: 12 },
-  statusWarning: { ...baseStatus, backgroundColor: "#fff9e8", borderColor: "#efd49a" },
+  statusWarning: {
+    ...baseStatus,
+    backgroundColor: "#fff9e8",
+    borderColor: "#efd49a",
+  },
   statusWarningText: { color: "#a56e13", fontSize: 12 },
   timelineRow: {
     alignItems: "center",

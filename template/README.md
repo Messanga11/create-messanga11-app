@@ -41,6 +41,13 @@ SQLite is development-only. The API validates a strict JSON payload and an
 allowlisted resource. Replace the development adapter and demo identity boundary
 before production deployment.
 
+The Refine-style Orders, Customers, Products, Categories, Stores and Couriers
+screens are backed by generated operations rather than static UI actions. Their
+list/create/update/delete flows persist in `.data/demo.sqlite`. Each resource is
+declared beside its page in `packages/features/src/app.feature.ts`; Core derives
+the CRUD contracts and the server derives its SQLite field allowlist and seed from
+that same declaration.
+
 Design rules and configuration live in `DESIGN.md`. Core provides the defaults;
 change project overrides in `packages/design-system/design.config.json`, then run
 `npm run design:sync`.
@@ -70,3 +77,9 @@ The backend uses the same compiled catalog. Requests to undeclared features or
 operations are rejected. Declared operations enforce method, strict input/output
 schemas, access policy, rate limiting, audit and idempotency before invoking an
 injected handler. SQLite remains a development adapter, not part of the feature API.
+
+To plug in a future domain, declare a resource and call
+`createFeatureCrudOperations`, or declare a custom operation with a stable handler
+identifier. Implement custom handlers only in the trusted server composition.
+Provider adapters implement Core ports; feature and UI packages never import a
+database, OIDC vendor or framework server type.

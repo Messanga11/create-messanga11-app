@@ -176,7 +176,7 @@ function TextField({
   );
 }
 
-async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+async function executeOperation(request: Parameters<UiEngine["executeOperation"]>[0]) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
   const response = await fetch(
     `${apiUrl}/api/features/${encodeURIComponent(request.featureId)}/${encodeURIComponent(request.operationId)}`,
@@ -186,13 +186,17 @@ async function executeMutation(request: Parameters<UiEngine["executeMutation"]>[
         "content-type": "application/json",
         "x-idempotency-key": crypto.randomUUID(),
       },
-      method: "POST",
+      method: request.method,
     },
   );
   if (!response.ok) throw new Error("L’opération a échoué.");
   const result: unknown = await response.json();
   if (!isJsonValue(result)) throw new Error("La réponse est invalide.");
   return result;
+}
+
+function executeMutation(request: Parameters<UiEngine["executeMutation"]>[0]) {
+  return executeOperation({ ...request, method: "POST" });
 }
 
 function resolveButtonStyle(state: PressableStateCallbackType) {
@@ -220,6 +224,7 @@ const NATIVE_UI_ENGINE: UiEngine = Object.freeze({
   StatusText,
   TextField,
   executeMutation,
+  executeOperation,
 });
 
 interface NativeFeatureRendererProps {

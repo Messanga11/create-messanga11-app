@@ -1,5 +1,11 @@
 import type { JsonValue } from "@messanga11/core";
-import { defineFeature, defineFeatureCatalog } from "@messanga11/core/features";
+import {
+  createFeatureCrudOperations,
+  defineFeature,
+  defineFeatureCatalog,
+  type FeatureResourceDefinition,
+} from "@messanga11/core/features";
+import type { ResourceListPrimitiveProps } from "@starter/ui-engine";
 import { DASHBOARD_DEMO } from "./demo-data/dashboard.ts";
 import { RESOURCE_DEMOS } from "./demo-data/resources.ts";
 import type { ProductFeatureId } from "./feature-types";
@@ -8,6 +14,10 @@ const PUBLIC_ACCESS = { mode: "public" } as const;
 const AUTHENTICATED_ACCESS = {
   mode: "authenticated",
   permissions: ["application:read"],
+} as const;
+const WRITE_ACCESS = {
+  mode: "authenticated",
+  permissions: ["application:write"],
 } as const;
 
 function screenFeature<
@@ -59,6 +69,114 @@ function screenFeature<
     schemaVersion: 1,
     version: "1.0.0",
   });
+}
+
+function resourceFeature(options: {
+  readonly description: string;
+  readonly id: string;
+  readonly path: string;
+  readonly view: ResourceListPrimitiveProps;
+}) {
+  const resource = toFeatureResource(options.id, options.view);
+  const { rows: _rows, ...view } = options.view;
+  return defineFeature({
+    blocks: ["resource.list"],
+    id: options.id,
+    operations: createFeatureCrudOperations({
+      auditPrefix: options.id,
+      readAccess: AUTHENTICATED_ACCESS,
+      resource,
+      writeAccess: WRITE_ACCESS,
+    }),
+    pages: [
+      {
+        access: AUTHENTICATED_ACCESS,
+        id: "index",
+        root: {
+          children: [
+            {
+              actions: { create: "create", delete: "delete", update: "update" },
+              block: "resource.list",
+              id: "content",
+              kind: "block",
+              props: view as unknown as Readonly<Record<string, JsonValue>>,
+              query: "list",
+            },
+          ],
+          id: "page",
+          kind: "layout",
+          layout: "application.shell",
+        },
+        routes: {
+          mobile: { path: options.path },
+          web: {
+            path: options.path,
+            seo: {
+              canonicalPath: options.path,
+              description: options.description,
+              index: false,
+              title: options.view.title,
+            },
+          },
+        },
+      },
+    ],
+    resources: [resource],
+    schemaVersion: 1,
+    version: "1.0.0",
+  });
+}
+
+function toFeatureResource(
+  id: string,
+  view: ResourceListPrimitiveProps,
+): FeatureResourceDefinition {
+  const fields: Record<string, FeatureResourceDefinition["fields"][string]> = {
+    id: {
+      create: false,
+      required: true,
+      schema: { minLength: 1, maxLength: 128, type: "string" },
+      update: false,
+    },
+  };
+  for (const column of view.columns) {
+    fields[column.id] = {
+      required: true,
+      schema: { maxLength: 240, type: "string" },
+    };
+    if (view.rows.some((row) => row.cells[column.id]?.secondary)) {
+      fields[`${column.id}Secondary`] = {
+        required: false,
+        schema: { maxLength: 240, type: "string" },
+      };
+    }
+    if (view.rows.some((row) => row.cells[column.id]?.tone)) {
+      fields[`${column.id}Tone`] = {
+        create: false,
+        required: false,
+        schema: {
+          enum: ["danger", "info", "neutral", "success", "warning"],
+          type: "string",
+        },
+        update: false,
+      };
+    }
+  }
+  return {
+    fields,
+    id,
+    seed: view.rows.map((row) => flattenResourceRow(row)),
+  };
+}
+
+function flattenResourceRow(row: ResourceListPrimitiveProps["rows"][number]) {
+  const record: Record<string, JsonValue> = { id: row.id };
+  for (const [field, cell] of Object.entries(row.cells)) {
+    record[field] = cell.value;
+    if (cell.secondary) record[`${field}Secondary`] = cell.secondary;
+    if (cell.tone) record[`${field}Tone`] = cell.tone;
+  }
+  return record;
 }
 
 const FORM_SUBMISSION_SCHEMA = {
@@ -299,59 +417,41 @@ export const APP_FEATURE_CATALOG = defineFeatureCatalog({
       props: DASHBOARD_DEMO,
       title: "Tableau de bord",
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Liste et suivi des commandes.",
       id: "orders",
       path: "/orders",
-      props: RESOURCE_DEMOS.orders,
-      title: "Orders",
+      view: RESOURCE_DEMOS.orders,
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Répertoire des clients.",
       id: "customers",
       path: "/customers",
-      props: RESOURCE_DEMOS.customers,
-      title: "Customers",
+      view: RESOURCE_DEMOS.customers,
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Catalogue des produits.",
       id: "products",
       path: "/products",
-      props: RESOURCE_DEMOS.products,
-      title: "Products",
+      view: RESOURCE_DEMOS.products,
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Organisation des catégories produits.",
       id: "categories",
       path: "/categories",
-      props: RESOURCE_DEMOS.categories,
-      title: "Categories",
+      view: RESOURCE_DEMOS.categories,
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Réseau des points de vente.",
       id: "stores",
       path: "/stores",
-      props: RESOURCE_DEMOS.stores,
-      title: "Stores",
+      view: RESOURCE_DEMOS.stores,
     }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "resource.list",
+    resourceFeature({
       description: "Disponibilité et activité des coursiers.",
       id: "couriers",
       path: "/couriers",
-      props: RESOURCE_DEMOS.couriers,
-      title: "Couriers",
+      view: RESOURCE_DEMOS.couriers,
     }),
     FORM_BUILDER_FEATURE,
     INVOICE_FEATURE,

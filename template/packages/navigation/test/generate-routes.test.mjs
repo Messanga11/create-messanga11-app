@@ -29,6 +29,11 @@ test("generates pages, SEO and the backend route from the feature catalog", asyn
   assert.ok(
     files.has("apps/web/src/app/api/features/[featureId]/[operationId]/route.ts"),
   );
+  const apiRoute = files.get(
+    "apps/web/src/app/api/features/[featureId]/[operationId]/route.ts",
+  );
+  assert.match(apiRoute, /dispatch as DELETE/);
+  assert.match(apiRoute, /dispatch as PATCH/);
 });
 
 test("writes identical routes safely from concurrent watchers", async () => {
