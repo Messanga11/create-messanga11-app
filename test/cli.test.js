@@ -79,7 +79,7 @@ test("scaffolds both applications and pins core", async () => {
   assert.match(catalog, /name: "sample-app"/);
   assert.match(catalog, /FORM_BUILDER_FEATURE/);
   assert.match(preset, /commerce/);
-  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.5\.0/);
+  assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.6\.0/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);
   assert.match(design, /npm run design:sync/);
@@ -88,6 +88,8 @@ test("scaffolds both applications and pins core", async () => {
   await readFile(join(target, "apps/web/src/app/formulaire/page.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/factures/page.tsx"), "utf8");
   await readFile(join(target, "apps/web/src/app/products/page.tsx"), "utf8");
+  await readFile(join(target, "apps/worker/src/index.ts"), "utf8");
+  await readFile(join(target, "compose.production.yaml"), "utf8");
   await readFile(join(target, "apps/mobile/app/index.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/formulaire.tsx"), "utf8");
   await readFile(join(target, "apps/mobile/app/factures.tsx"), "utf8");

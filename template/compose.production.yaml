@@ -1,0 +1,37 @@
+services:
+  migrate:
+    build:
+      context: .
+      target: worker
+    command: ["node", "dist/migrate.js"]
+    env_file: .env.production
+    restart: "no"
+  web:
+    build:
+      context: .
+      target: web
+    env_file: .env.production
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health/ready').then(r=>{if(!r.ok)process.exit(1)})"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    init: true
+    read_only: true
+    restart: unless-stopped
+    tmpfs: ["/tmp"]
+  worker:
+    build:
+      context: .
+      target: worker
+    env_file: .env.production
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    init: true
+    read_only: true
+    restart: unless-stopped
+    tmpfs: ["/tmp"]

@@ -7,12 +7,15 @@ const SECURITY_HEADERS = [
 ];
 
 const config: NextConfig = {
+  output: "standalone",
   async headers() {
     return [{ headers: SECURITY_HEADERS, source: "/(.*)" }];
   },
   serverExternalPackages: [
     "@messanga11/core",
     "@messanga11/adapter-sqlite",
+    "@messanga11/adapter-postgres",
+    "@messanga11/adapter-redis",
     "better-sqlite3",
   ],
   transpilePackages: [
