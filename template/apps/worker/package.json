@@ -1,36 +1,25 @@
 {
-  "name": "@starter/web",
+  "name": "@starter/worker",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "start": "next start",
-    "test": "node --import tsx --test src/server/*.test.ts",
+    "build": "tsup src/index.ts src/migrate.ts src/deploy-check.ts --format esm --platform node --out-dir dist",
+    "deploy:check": "node dist/deploy-check.js",
+    "migrate": "node dist/migrate.js",
+    "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@messanga11/adapter-postgres": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-adapter-postgres-0.2.0.tgz",
     "@messanga11/adapter-redis": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-adapter-redis-0.2.0.tgz",
-    "@messanga11/adapter-sqlite": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-adapter-sqlite-0.2.1.tgz",
     "@messanga11/auth-oidc": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-auth-oidc-0.2.0.tgz",
     "@messanga11/core": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-core-0.6.0.tgz",
-    "@messanga11/telemetry": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-telemetry-0.1.1.tgz",
     "@messanga11/tenancy": "https://github.com/Messanga11/core/releases/download/core-v0.6.0/messanga11-tenancy-0.1.1.tgz",
-    "@starter/domain": "0.1.0",
-    "@starter/features": "0.1.0",
-    "better-sqlite3": "^13.0.3",
-    "@starter/ui-web": "0.1.0",
-    "next": "^16.3.2",
     "pg": "^8.16.3",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.5",
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "tsup": "^8.5.1"
   }
 }

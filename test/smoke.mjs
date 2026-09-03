@@ -50,6 +50,7 @@ for (const argumentsList of [
   ["run", "typecheck"],
   ["test"],
   ["run", "build:web"],
+  ["run", "build", "-w", "@starter/worker"],
   ["run", "build:mobile"],
 ]) {
   await runNpm(argumentsList);

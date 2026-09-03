@@ -9,26 +9,30 @@ import {
 import { compileFeatureCatalog } from "@messanga11/core/features";
 import { calculateInvoiceAmounts } from "@starter/domain";
 import { APP_FEATURE_CATALOG } from "@starter/features/catalog";
-import { sqliteCrud, sqliteFeatureResources, writeFeatureAudit } from "./sqlite-crud";
+import {
+  resolveRuntimeIdentity,
+  runtimeCrud,
+  runtimeFeatureResources,
+  runtimeRateLimit,
+  writeRuntimeAudit,
+} from "./runtime-storage";
 
 const MAX_BODY_BYTES = 1_000_000;
 const CATALOG = compileFeatureCatalog(APP_FEATURE_CATALOG);
-const RATE_LIMITS = new Map<string, { count: number; resetsAt: number }>();
 
 const BASE_PORTS: FeatureBackendPorts = {
-  audit: async (event) => writeFeatureAudit(event),
+  audit: writeRuntimeAudit,
   authorize: async ({ context, operation }) =>
     operation.access.mode === "authenticated" &&
     operation.access.permissions.every((permission) =>
       context.permissions.has(permission),
     ),
   handlers: {
-    ...createFeatureCrudHandlers(sqliteFeatureResources),
+    ...createFeatureCrudHandlers(runtimeFeatureResources),
     "form-builder.submit": submitForm,
     "invoice.create": createInvoice,
   },
-  rateLimit: async ({ context, operation, policy }) =>
-    consumeRateLimit(`${context.rateLimitKey ?? "anonymous"}:${operation}`, policy),
+  rateLimit: runtimeRateLimit,
 };
 
 export interface FeatureBackendExtension {
@@ -52,7 +56,7 @@ export function createFeatureRequestHandler(extension: FeatureBackendExtension =
     ...extension.ports,
     handlers: mergeHandlers(BASE_PORTS.handlers, extension.handlers ?? {}),
   };
-  const identity = extension.identity ?? resolveIdentity;
+  const identity = extension.identity ?? resolveRuntimeIdentity;
   return async (
     request: Request,
     params: { readonly featureId: string; readonly operationId: string },
@@ -115,15 +119,6 @@ async function executeRequest(
   );
 }
 
-function resolveIdentity(): FeatureIdentity {
-  if (process.env.NODE_ENV === "production") return { permissions: new Set() };
-  return {
-    actorId: "demo-user",
-    permissions: new Set(["application:read", "application:write"]),
-    tenantId: "demo-tenant",
-  };
-}
-
 function mergeHandlers(
   builtIn: Readonly<Record<string, FeatureOperationHandler>>,
   extensions: Readonly<Record<string, FeatureOperationHandler>>,
@@ -137,13 +132,14 @@ function mergeHandlers(
 async function submitForm(invocation: FeatureOperationInvocation) {
   const idempotencyKey = invocation.idempotencyKey;
   if (!idempotencyKey) throw new Error("Missing idempotency key.");
-  const existing = await findSubmission(idempotencyKey);
+  const existing = await findSubmission(idempotencyKey, invocation.context.tenantId);
   if (existing) return pickSubmissionResult(existing);
   const createdAt = new Date().toISOString();
   try {
-    const record = await sqliteCrud.create({
+    const record = await runtimeCrud.create({
       idempotencyKey,
       resource: "form_submissions",
+      ...(invocation.context.tenantId ? { tenantId: invocation.context.tenantId } : {}),
       values: {
         createdAt,
         formId: "form-builder",
@@ -154,7 +150,7 @@ async function submitForm(invocation: FeatureOperationInvocation) {
     });
     return pickSubmissionResult(record);
   } catch (caught) {
-    const raced = await findSubmission(idempotencyKey);
+    const raced = await findSubmission(idempotencyKey, invocation.context.tenantId);
     if (raced) return pickSubmissionResult(raced);
     throw caught;
   }
@@ -163,7 +159,11 @@ async function submitForm(invocation: FeatureOperationInvocation) {
 async function createInvoice(invocation: FeatureOperationInvocation) {
   const idempotencyKey = invocation.idempotencyKey;
   if (!idempotencyKey) throw new Error("Missing idempotency key.");
-  const existing = await findByIdempotencyKey("invoices", idempotencyKey);
+  const existing = await findByIdempotencyKey(
+    "invoices",
+    idempotencyKey,
+    invocation.context.tenantId,
+  );
   if (existing) return pickInvoiceResult(existing);
   const input = readInvoiceInput(invocation.input);
   const amounts = calculateInvoiceAmounts(input);
@@ -171,9 +171,10 @@ async function createInvoice(invocation: FeatureOperationInvocation) {
   const createdAt = new Date().toISOString();
   const invoiceNumber = `FAC-${createdAt.slice(0, 10).replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   try {
-    const record = await sqliteCrud.create({
+    const record = await runtimeCrud.create({
       idempotencyKey,
       resource: "invoices",
+      ...(invocation.context.tenantId ? { tenantId: invocation.context.tenantId } : {}),
       values: {
         createdAt,
         idempotencyKey,
@@ -184,22 +185,31 @@ async function createInvoice(invocation: FeatureOperationInvocation) {
     });
     return pickInvoiceResult(record);
   } catch (caught) {
-    const raced = await findByIdempotencyKey("invoices", idempotencyKey);
+    const raced = await findByIdempotencyKey(
+      "invoices",
+      idempotencyKey,
+      invocation.context.tenantId,
+    );
     if (raced) return pickInvoiceResult(raced);
     throw caught;
   }
 }
 
-async function findSubmission(idempotencyKey: string) {
-  return findByIdempotencyKey("form_submissions", idempotencyKey);
+async function findSubmission(idempotencyKey: string, tenantId?: string) {
+  return findByIdempotencyKey("form_submissions", idempotencyKey, tenantId);
 }
 
-async function findByIdempotencyKey(resource: string, idempotencyKey: string) {
-  const result = await sqliteCrud.list({
+async function findByIdempotencyKey(
+  resource: string,
+  idempotencyKey: string,
+  tenantId?: string,
+) {
+  const result = await runtimeCrud.list({
     filters: [{ field: "idempotencyKey", operator: "eq", value: idempotencyKey }],
     limit: 1,
     offset: 0,
     resource,
+    ...(tenantId ? { tenantId } : {}),
   });
   return result.records[0];
 }
@@ -233,28 +243,6 @@ function isJsonObject(value: JsonValue): value is Readonly<Record<string, JsonVa
 function readNumber(value: JsonValue | undefined): number {
   if (typeof value !== "number") throw new Error("Invalid invoice number.");
   return value;
-}
-
-function consumeRateLimit(
-  key: string,
-  policy: {
-    readonly cost: number;
-    readonly limit: number;
-    readonly windowMs: number;
-  },
-) {
-  const now = Date.now();
-  const current = RATE_LIMITS.get(key);
-  const bucket =
-    !current || current.resetsAt <= now
-      ? { count: 0, resetsAt: now + policy.windowMs }
-      : current;
-  if (bucket.count + policy.cost > policy.limit) {
-    return { allowed: false, retryAfterMs: Math.max(1, bucket.resetsAt - now) };
-  }
-  bucket.count += policy.cost;
-  RATE_LIMITS.set(key, bucket);
-  return { allowed: true };
 }
 
 function readClientKey(request: Request): string {

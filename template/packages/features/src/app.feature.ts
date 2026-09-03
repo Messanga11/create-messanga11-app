@@ -9,6 +9,7 @@ import type { ResourceListPrimitiveProps } from "@starter/ui-engine";
 import { DASHBOARD_DEMO } from "./demo-data/dashboard.ts";
 import { RESOURCE_DEMOS } from "./demo-data/resources.ts";
 import type { ProductFeatureId } from "./feature-types";
+import { ENABLED_FEATURE_IDS } from "./preset";
 
 const PUBLIC_ACCESS = { mode: "public" } as const;
 const AUTHENTICATED_ACCESS = {
@@ -400,6 +401,96 @@ export const INVOICE_FEATURE = defineFeature({
   version: "1.0.0",
 });
 
+const AVAILABLE_FEATURES = [
+  screenFeature({
+    access: AUTHENTICATED_ACCESS,
+    block: "dashboard.screen",
+    description: "Tableau de bord de démonstration Messanga11.",
+    id: "dashboard",
+    path: "/",
+    props: DASHBOARD_DEMO,
+    title: "Tableau de bord",
+  }),
+  resourceFeature({
+    description: "Liste et suivi des commandes.",
+    id: "orders",
+    path: "/orders",
+    view: RESOURCE_DEMOS.orders,
+  }),
+  resourceFeature({
+    description: "Répertoire des clients.",
+    id: "customers",
+    path: "/customers",
+    view: RESOURCE_DEMOS.customers,
+  }),
+  resourceFeature({
+    description: "Catalogue des produits.",
+    id: "products",
+    path: "/products",
+    view: RESOURCE_DEMOS.products,
+  }),
+  resourceFeature({
+    description: "Organisation des catégories produits.",
+    id: "categories",
+    path: "/categories",
+    view: RESOURCE_DEMOS.categories,
+  }),
+  resourceFeature({
+    description: "Réseau des points de vente.",
+    id: "stores",
+    path: "/stores",
+    view: RESOURCE_DEMOS.stores,
+  }),
+  resourceFeature({
+    description: "Disponibilité et activité des coursiers.",
+    id: "couriers",
+    path: "/couriers",
+    view: RESOURCE_DEMOS.couriers,
+  }),
+  FORM_BUILDER_FEATURE,
+  INVOICE_FEATURE,
+  screenFeature({
+    access: PUBLIC_ACCESS,
+    block: "authentication.screen",
+    description: "Connexion sécurisée à la démonstration Messanga11.",
+    id: "authentication",
+    path: "/authentification",
+    title: "Authentification",
+  }),
+  screenFeature({
+    access: AUTHENTICATED_ACCESS,
+    block: "profile.screen",
+    description: "Consultation et modification du profil utilisateur.",
+    id: "profile",
+    path: "/profil",
+    title: "Profil",
+  }),
+  screenFeature({
+    access: AUTHENTICATED_ACCESS,
+    block: "notifications.screen",
+    description: "Centre de notifications et préférences de communication.",
+    id: "notifications",
+    path: "/notifications",
+    title: "Notifications",
+  }),
+  screenFeature({
+    access: AUTHENTICATED_ACCESS,
+    block: "team.screen",
+    description: "Gestion des membres, rôles et invitations de l'équipe.",
+    id: "team",
+    path: "/equipe",
+    title: "Équipe",
+  }),
+  screenFeature({
+    access: AUTHENTICATED_ACCESS,
+    block: "settings.screen",
+    description: "Paramètres du compte et préférences de l'application.",
+    id: "settings",
+    path: "/parametres",
+    title: "Paramètres",
+  }),
+] as const;
+
 export const APP_FEATURE_CATALOG = defineFeatureCatalog({
   application: {
     defaultLocale: "fr",
@@ -407,95 +498,9 @@ export const APP_FEATURE_CATALOG = defineFeatureCatalog({
     name: "__PROJECT_NAME__",
     shortName: "__PROJECT_NAME__",
   },
-  features: [
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "dashboard.screen",
-      description: "Tableau de bord de démonstration Messanga11.",
-      id: "dashboard",
-      path: "/",
-      props: DASHBOARD_DEMO,
-      title: "Tableau de bord",
-    }),
-    resourceFeature({
-      description: "Liste et suivi des commandes.",
-      id: "orders",
-      path: "/orders",
-      view: RESOURCE_DEMOS.orders,
-    }),
-    resourceFeature({
-      description: "Répertoire des clients.",
-      id: "customers",
-      path: "/customers",
-      view: RESOURCE_DEMOS.customers,
-    }),
-    resourceFeature({
-      description: "Catalogue des produits.",
-      id: "products",
-      path: "/products",
-      view: RESOURCE_DEMOS.products,
-    }),
-    resourceFeature({
-      description: "Organisation des catégories produits.",
-      id: "categories",
-      path: "/categories",
-      view: RESOURCE_DEMOS.categories,
-    }),
-    resourceFeature({
-      description: "Réseau des points de vente.",
-      id: "stores",
-      path: "/stores",
-      view: RESOURCE_DEMOS.stores,
-    }),
-    resourceFeature({
-      description: "Disponibilité et activité des coursiers.",
-      id: "couriers",
-      path: "/couriers",
-      view: RESOURCE_DEMOS.couriers,
-    }),
-    FORM_BUILDER_FEATURE,
-    INVOICE_FEATURE,
-    screenFeature({
-      access: PUBLIC_ACCESS,
-      block: "authentication.screen",
-      description: "Connexion sécurisée à la démonstration Messanga11.",
-      id: "authentication",
-      path: "/authentification",
-      title: "Authentification",
-    }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "profile.screen",
-      description: "Consultation et modification du profil utilisateur.",
-      id: "profile",
-      path: "/profil",
-      title: "Profil",
-    }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "notifications.screen",
-      description: "Centre de notifications et préférences de communication.",
-      id: "notifications",
-      path: "/notifications",
-      title: "Notifications",
-    }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "team.screen",
-      description: "Gestion des membres, rôles et invitations de l'équipe.",
-      id: "team",
-      path: "/equipe",
-      title: "Équipe",
-    }),
-    screenFeature({
-      access: AUTHENTICATED_ACCESS,
-      block: "settings.screen",
-      description: "Paramètres du compte et préférences de l'application.",
-      id: "settings",
-      path: "/parametres",
-      title: "Paramètres",
-    }),
-  ],
+  features: AVAILABLE_FEATURES.filter((feature) =>
+    ENABLED_FEATURE_IDS.includes(feature.id as ProductFeatureId),
+  ),
   schemaVersion: 1,
 });
 

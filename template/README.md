@@ -8,6 +8,10 @@ Next.js and Expo monorepo powered by `@messanga11/core`.
 npm run dev:web
 ```
 
+This project was generated with the `__PRESET__` capability preset. Change the
+selection in `packages/features/src/preset.ts`, then run `npm run routes:generate`;
+the compiler will add and remove the corresponding Web and Mobile routes.
+
 In another terminal:
 
 ```sh
@@ -22,6 +26,7 @@ with the LAN address of the machine running Next.js.
 ```text
 apps/web       Next.js App Router and trusted server composition
 apps/mobile    Expo Router and native rendering
+apps/worker    Leased outbox delivery with signed, deduplicable webhooks
 packages/domain  Shared schemas, policies and semantic view-models
 packages/design-system  Shared semantic tokens for Web and Native
 packages/features  Shared UI composition, state and actions
@@ -37,9 +42,10 @@ date range/timezone, document metadata and a review step. Web orchestration uses
 Refine.dev and persists to `.data/demo.sqlite`; Expo submits to the same Next API
 through `EXPO_PUBLIC_API_URL`.
 
-SQLite is development-only. The API validates a strict JSON payload and an
-allowlisted resource. Replace the development adapter and demo identity boundary
-before production deployment.
+SQLite is development-only. In production the same contracts switch to
+PostgreSQL with tenant RLS and optimistic revisions, Redis Functions for atomic
+rate limiting, and an OIDC Authorization Code + PKCE BFF. Missing production
+configuration fails closed.
 
 The Refine-style Orders, Customers, Products, Categories, Stores and Couriers
 screens are backed by generated operations rather than static UI actions. Their
@@ -53,8 +59,8 @@ change project overrides in `packages/design-system/design.config.json`, then ru
 `npm run design:sync`.
 
 `@messanga11/core/testing` is suitable only for tests and local prototypes.
-Before adding mutations, implement production identity, authorization, quota,
-rate-limit and audit ports in the trusted Web server boundary.
+Production identity, authorization, rate-limit, audit, encrypted provider-token
+storage and outbox ports are composed in `apps/web/src/server`.
 
 Feature screens are authored once in `packages/features`. Declare every feature,
 page, layout, block, route, SEO contract and backend operation in
@@ -83,3 +89,23 @@ To plug in a future domain, declare a resource and call
 identifier. Implement custom handlers only in the trusted server composition.
 Provider adapters implement Core ports; feature and UI packages never import a
 database, OIDC vendor or framework server type.
+
+## Production deployment
+
+Copy `.env.example` to `.env.production` and supply separate PostgreSQL
+application and migration roles. The application role must not be a superuser,
+must not own tenant tables and must not have `BYPASSRLS`. Redis must use TLS.
+
+```sh
+npm run core:migrate
+npm run core:deploy:check
+docker compose -f compose.production.yaml up --build
+```
+
+The Compose file is directly importable by Dokploy. Only expose the Web service
+through its HTTPS reverse proxy. PostgreSQL, Redis and the event sink stay on a
+private network or use managed TLS endpoints. The one-shot migration must finish
+before Web and Worker start; readiness remains red until all five bundled
+migrations are present. Backups, PITR retention, restore drills, domain/TLS and
+provider credentials are infrastructure-specific and must be configured in the
+deployment environment rather than committed to this repository.

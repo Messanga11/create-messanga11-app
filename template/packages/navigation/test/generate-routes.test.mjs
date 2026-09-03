@@ -1,6 +1,23 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { generateRoutes } from "../scripts/generate-routes.mjs";
+import {
+  frameworkRoutePath,
+  generateRoutes,
+  mobileRouteFile,
+  webRouteFile,
+} from "../scripts/generate-routes.mjs";
+
+test("maps typed dynamic routes to Next.js and Expo segments", () => {
+  assert.equal(
+    frameworkRoutePath("/teams/:teamId/members/:memberId"),
+    "/teams/[teamId]/members/[memberId]",
+  );
+  assert.equal(
+    webRouteFile("/teams/:teamId"),
+    "apps/web/src/app/teams/[teamId]/page.tsx",
+  );
+  assert.equal(mobileRouteFile("/teams/:teamId"), "apps/mobile/app/teams/[teamId].tsx");
+});
 
 test("generates pages, SEO and the backend route from the feature catalog", async () => {
   const files = await generateRoutes();
