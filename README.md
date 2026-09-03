@@ -44,8 +44,13 @@ same declarative feature data renders through the Web and Native engines.
 ## Options
 
 ```sh
+npx --yes github:Messanga11/create-messanga11-app#v0.9.0 my-app --preset commerce
 npx --yes github:Messanga11/create-messanga11-app#v0.9.0 my-app --no-install
 ```
+
+Available allowlisted presets are `saas`, `admin`, `commerce`, `delivery`,
+`booking`, `marketplace`, `content` and `custom`. The preset filters the compiled
+feature catalog; route generation then removes outputs that are no longer declared.
 
 Project names accept lowercase letters, numbers and hyphens. Existing non-empty
 directories are never overwritten.

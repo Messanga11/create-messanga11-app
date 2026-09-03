@@ -8,6 +8,10 @@ Next.js and Expo monorepo powered by `@messanga11/core`.
 npm run dev:web
 ```
 
+This project was generated with the `__PRESET__` capability preset. Change the
+selection in `packages/features/src/preset.ts`, then run `npm run routes:generate`;
+the compiler will add and remove the corresponding Web and Mobile routes.
+
 In another terminal:
 
 ```sh

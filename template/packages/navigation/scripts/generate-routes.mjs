@@ -139,7 +139,7 @@ function renderRobots() {
 
 function renderSitemap(config) {
   const indexedPaths = config.routes
-    .filter((route) => route.web?.index)
+    .filter((route) => route.web?.index && !route.web.path.includes(":"))
     .map((route) => route.web.path);
   return `${GENERATED_HEADER}import type { MetadataRoute } from "next";\nimport { getSiteUrl } from "./site-url";\n\nconst INDEXED_PATHS = ${JSON.stringify(indexedPaths)} as const;\n\nexport default function sitemap(): MetadataRoute.Sitemap {\n  const siteUrl = getSiteUrl();\n  return INDEXED_PATHS.map((path) => ({ url: new URL(path, siteUrl).toString() }));\n}\n`;
 }
@@ -152,14 +152,25 @@ function renderManifest(config) {
   return `${GENERATED_HEADER}import type { MetadataRoute } from "next";\n\nexport default function manifest(): MetadataRoute.Manifest {\n  return {\n    name: ${JSON.stringify(config.app.name)},\n    short_name: ${JSON.stringify(config.app.shortName)},\n    description: ${JSON.stringify(config.app.description)},\n    start_url: "/",\n    display: "standalone",\n  };\n}\n`;
 }
 
-function webRouteFile(path) {
-  return path === "/"
+export function webRouteFile(path) {
+  const frameworkPath = frameworkRoutePath(path);
+  return frameworkPath === "/"
     ? "apps/web/src/app/page.tsx"
-    : `apps/web/src/app${path}/page.tsx`;
+    : `apps/web/src/app${frameworkPath}/page.tsx`;
 }
 
-function mobileRouteFile(path) {
-  return path === "/" ? "apps/mobile/app/index.tsx" : `apps/mobile/app${path}.tsx`;
+export function mobileRouteFile(path) {
+  const frameworkPath = frameworkRoutePath(path);
+  return frameworkPath === "/"
+    ? "apps/mobile/app/index.tsx"
+    : `apps/mobile/app${frameworkPath}.tsx`;
+}
+
+export function frameworkRoutePath(path) {
+  return path
+    .split("/")
+    .map((segment) => (segment.startsWith(":") ? `[${segment.slice(1)}]` : segment))
+    .join("/");
 }
 
 async function assertGeneratedFilesCurrent(expected, previous) {

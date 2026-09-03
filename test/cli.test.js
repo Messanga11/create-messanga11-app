@@ -10,8 +10,18 @@ test("parses a project name and no-install option", () => {
   assert.deepEqual(parseArguments(["my-app", "--no-install"]), {
     help: false,
     install: false,
+    preset: "admin",
     projectName: "my-app",
   });
+});
+
+test("parses an allowlisted capability preset", () => {
+  assert.equal(parseArguments(["my-app", "--preset", "commerce"]).preset, "commerce");
+  assert.equal(parseArguments(["my-app", "--preset=delivery"]).preset, "delivery");
+  assert.throws(
+    () => parseArguments(["my-app", "--preset", "unknown"]),
+    /Unknown preset/,
+  );
 });
 
 test("rejects paths and shell syntax as project names", () => {
@@ -25,6 +35,7 @@ test("scaffolds both applications and pins core", async () => {
   const target = await scaffoldProject({
     cwd,
     install: false,
+    preset: "commerce",
     projectName: "sample-app",
   });
 
@@ -54,6 +65,10 @@ test("scaffolds both applications and pins core", async () => {
     join(target, "packages/features/src/app.feature.ts"),
     "utf8",
   );
+  const preset = await readFile(
+    join(target, "packages/features/src/preset.ts"),
+    "utf8",
+  );
 
   assert.equal(rootManifest.name, "sample-app");
   assert.equal(designManifest.name, "@starter/design-system");
@@ -63,6 +78,7 @@ test("scaffolds both applications and pins core", async () => {
   assert.equal(navigationManifest.name, "@starter/navigation");
   assert.match(catalog, /name: "sample-app"/);
   assert.match(catalog, /FORM_BUILDER_FEATURE/);
+  assert.match(preset, /commerce/);
   assert.match(domainManifest.dependencies["@messanga11/core"], /core-v0\.5\.0/);
   assert.match(mobileConfig, /com\.messanga11\.appsampleapp/);
   assert.match(agents, /Read `DESIGN\.md`/);

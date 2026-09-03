@@ -24,7 +24,7 @@ export async function scaffoldProject(options) {
   await mkdir(target, { recursive: true });
   await cp(templateDirectory, target, { recursive: true });
   await rename(join(target, "_gitignore"), join(target, ".gitignore"));
-  await replaceProjectName(target, options.projectName);
+  await replaceTemplateValues(target, options.projectName, options.preset ?? "admin");
 
   if (options.install) {
     await execute(options, npmExecutable, ["install"], target);
@@ -46,11 +46,11 @@ async function assertEmptyTarget(target) {
   }
 }
 
-async function replaceProjectName(directory, projectName) {
+async function replaceTemplateValues(directory, projectName, preset) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      await replaceProjectName(path, projectName);
+      await replaceTemplateValues(path, projectName, preset);
       continue;
     }
     const contents = await readFile(path, "utf8");
@@ -58,7 +58,8 @@ async function replaceProjectName(directory, projectName) {
       path,
       contents
         .replaceAll("__PROJECT_NAME__", projectName)
-        .replaceAll("__PROJECT_IDENTIFIER__", `app${projectName.replaceAll("-", "")}`),
+        .replaceAll("__PROJECT_IDENTIFIER__", `app${projectName.replaceAll("-", "")}`)
+        .replaceAll("__PRESET__", preset),
       "utf8",
     );
   }
